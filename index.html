@@ -439,100 +439,96 @@ footer p{max-width:80ch}
   .stick{display:block;position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom,0px) + 14px);z-index:30;transform:translate(-50%,140%);transition:transform .45s cubic-bezier(.2,.7,.2,1);font:600 14px/1 var(--body);letter-spacing:.03em;padding:15px 26px;border-radius:999px;background:var(--brass);color:var(--ink);text-decoration:none;box-shadow:0 10px 30px -8px rgba(0,0,0,.55);white-space:nowrap}
   .stick.on{transform:translate(-50%,0)}
 }
+/* sections off screen are not laid out or painted until they come near (web.dev: content-visibility); the size they
+   had once rendered is remembered, so the page does not jump */
+main > section{content-visibility:auto;contain-intrinsic-size:auto 1100px}
 /* ---------- from Kaba-Kaba (2026-09-27): blocks ease in as they come into view; soft scrolling on desktop ---------- */
 html.lenis,html.lenis body{height:auto}.lenis.lenis-smooth{scroll-behavior:auto!important}.lenis.lenis-stopped{overflow:clip}
 .js .rv{opacity:0;transform:translateY(26px);transition:opacity 1.1s cubic-bezier(.2,.7,.2,1),transform 1.1s cubic-bezier(.2,.7,.2,1)}
 .js .rv.in{opacity:1;transform:none}
 @media (prefers-reduced-motion:reduce){.js .rv{opacity:1!important;transform:none!important;transition:none!important}}
-/* ---------- preloader (2026-09-27): the survey's contours draw themselves from the river up to the road while the
-   page loads; then the curtain lifts on a page that is already complete ---------- */
+/* ---------- preloader (2026-09-27, v2 "smooth"): every moving part animates only transform and opacity in plain CSS, so
+   it runs on the compositor thread and cannot stall while the page works (web.dev: stick to compositor-only
+   properties). The survey's contours rise in six waves from the river to the road; the name's letters rise one by
+   one; the bar follows the real progress. Heavy work (the live 3D) waits until the curtain has lifted. ---------- */
 html.ld-lock{overflow:hidden}
 .ld{position:fixed;inset:0;z-index:100;background:var(--ink);color:var(--stone);display:grid;place-items:center;transition:transform 1.15s cubic-bezier(.76,0,.24,1);will-change:transform}
 .ld.out{transform:translateY(-100%)}
 .ld-in{position:relative;width:min(80vw,600px);display:grid;place-items:center}
-.ld-map{display:block;width:100%;height:auto;overflow:visible;transition:transform 1.4s cubic-bezier(.2,.7,.2,1),opacity .9s ease}
-.ld-map path{fill:none;stroke-dasharray:1;stroke-dashoffset:1;stroke-linecap:round;stroke-linejoin:round}
-.ld-map .c{stroke:rgba(176,144,92,.5);stroke-width:.16}
-.ld-map .b{stroke:var(--brass-hi);stroke-width:.32}
-.ld.out .ld-map{transform:scale(1.07);opacity:0}
+.ld-map{position:relative;width:100%}
+.ld-map svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible;will-change:opacity,transform}
+.ld-map path{fill:none;stroke-linecap:round;stroke-linejoin:round}
+.ld-map .b path{stroke:var(--brass-hi);stroke-width:.32}
+.ld-map .c path{stroke:rgba(176,144,92,.5);stroke-width:.16}
+.ld-map .b{animation:ldB 1.2s cubic-bezier(.2,.7,.2,1) .1s both}
+.ld-map .c{animation:ldC 1.1s cubic-bezier(.2,.7,.2,1) both;animation-delay:calc(.45s + var(--i) * .2s)}
+@keyframes ldB{from{opacity:0;transform:scale(.965)}to{opacity:1;transform:none}}
+@keyframes ldC{from{opacity:0;transform:translateX(3.5%)}to{opacity:1;transform:none}}   /* in from the river side */
 .ld-cap{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;pointer-events:none}
-.ld-name{font:600 clamp(58px,12vw,148px)/1 var(--display);font-variation-settings:"opsz" 28;letter-spacing:.34em;text-indent:.34em;color:#f4f3ee;opacity:0;filter:blur(8px);text-shadow:0 2px 30px rgba(10,13,11,.85);transition:letter-spacing 2.4s cubic-bezier(.16,.8,.2,1),text-indent 2.4s cubic-bezier(.16,.8,.2,1),opacity 1.4s ease,filter 1.6s ease}
-.ld.named .ld-name{letter-spacing:-.02em;text-indent:-.02em;opacity:1;filter:blur(0)}
-.ld-coords{font:500 11px/1 var(--mono);letter-spacing:.22em;text-transform:uppercase;color:rgba(228,227,220,.62);opacity:0;transition:opacity 1.2s ease .9s}
-.ld.named .ld-coords{opacity:1}
-.ld-foot{position:absolute;left:50%;bottom:calc(env(safe-area-inset-bottom,0px) + 40px);transform:translateX(-50%);display:grid;justify-items:center;gap:12px}
+.ld-name{font:600 clamp(58px,12vw,148px)/1 var(--display);font-variation-settings:"opsz" 28;letter-spacing:-.02em;color:#f4f3ee;text-shadow:0 2px 30px rgba(10,13,11,.85);white-space:nowrap}
+.ld-name span{display:inline-block;animation:ldL 1.1s cubic-bezier(.2,.7,.2,1) both;animation-delay:calc(.15s + var(--i) * .08s);will-change:opacity,transform}
+@keyframes ldL{from{opacity:0;transform:translateY(.28em)}to{opacity:1;transform:none}}
+.ld-coords{font:500 11px/1 var(--mono);letter-spacing:.22em;text-transform:uppercase;color:rgba(228,227,220,.62);animation:ldF 1s ease .9s both}
+@keyframes ldF{from{opacity:0}to{opacity:1}}
+.ld:not(.named) .ld-name span,.ld:not(.named) .ld-coords{animation-play-state:paused}   /* wait for the typeface */
+.ld-foot{position:absolute;left:50%;bottom:calc(env(safe-area-inset-bottom,0px) + 44px);transform:translateX(-50%)}
 .ld-bar{width:140px;height:1px;background:rgba(228,227,220,.16);overflow:hidden}
-.ld-bar i{display:block;height:100%;background:var(--brass-hi);transform:scaleX(0);transform-origin:left}
-.ld-pct{font:500 11px/1 var(--mono);letter-spacing:.22em;color:rgba(228,227,220,.55);font-variant-numeric:tabular-nums}
-.ld.out .ld-cap,.ld.out .ld-foot{opacity:0;transition:opacity .5s ease}
+.ld-bar i{display:block;height:100%;background:var(--brass-hi);transform:scaleX(.04);transform-origin:left;transition:transform .9s cubic-bezier(.2,.7,.2,1)}
+.ld-in,.ld-foot{transition:opacity .5s ease,transform 1.2s cubic-bezier(.2,.7,.2,1)}
+.ld.out .ld-in{opacity:0;transform:scale(1.05) translateY(-2%)}.ld.out .ld-foot{opacity:0}
 /* the hero's text rises in once the curtain lifts */
 .hero .wrap>*{transition:opacity 1s ease,transform 1.3s cubic-bezier(.16,.8,.2,1)}
 html.ld-lock .hero .wrap>*{opacity:0;transform:translateY(26px)}
 .hero .wrap>:nth-child(1){transition-delay:.45s}.hero .wrap>:nth-child(2){transition-delay:.55s}.hero .wrap>:nth-child(3){transition-delay:.7s}.hero .wrap>:nth-child(4){transition-delay:.85s}
-@media (prefers-reduced-motion:reduce){.ld,.ld-map,.ld-name,.ld-coords,.hero .wrap>*{transition:opacity .4s ease!important}.ld.out{transform:none;opacity:0}.ld-name{letter-spacing:-.02em;text-indent:-.02em;filter:none}html.ld-lock .hero .wrap>*{transform:none}}
+/* the live 3D arrives after the curtain: it fades in over the still that stands in for it */
+.stage canvas,.concept-stage canvas{animation:ldF 1.2s ease both}
+@media (prefers-reduced-motion:reduce){.ld-map svg,.ld-name span,.ld-coords{animation:none!important;opacity:1}.ld{transition:opacity .4s ease}.ld.out{transform:none;opacity:0}.hero .wrap>*{transition:opacity .4s ease}html.ld-lock .hero .wrap>*{transform:none}}
 </style>
 
 <script>document.documentElement.classList.add("js")</script>
 <noscript><style>.ld{display:none}</style></noscript>
 <div class="ld" id="loader" role="status" aria-label="Loading">
   <div class="ld-in">
-    <svg class="ld-map" viewBox="0 0 86 72" aria-hidden="true"><path class="c" d="M82.1 59.4 81.0 54.4 80.9 50.6 79.1 44.1 78.2 33.3 78.4 32.5 79.4 32.1 78.6 22.1 76.8 13.6 77.1 10.2 75.7 2.9 75.2 2.2" pathLength="1"/><path class="c" d="M73.4 2.4 74.5 4.2 75.6 9.5 75.1 14.8 75.3 19.0 76.5 24.3 76.7 28.6 77.8 30.8 77.0 32.5 79.1 53.3 81.5 61.0" pathLength="1"/><path class="c" d="M77.3 45.7 77.6 45.6 77.4 44.8 77.4 45.5 77.3 45.7" pathLength="1"/><path class="c" d="M81.0 62.6 79.3 57.8 77.6 49.9 78.1 46.5 76.1 32.0 76.2 28.5 74.3 24.3 74.5 16.0 73.7 12.6 72.8 4.7 71.6 2.6" pathLength="1"/><path class="c" d="M80.5 64.2 79.2 60.4 76.6 49.4 73.8 47.4 73.5 46.9 75.3 37.2 72.4 32.0 72.5 27.9 71.0 22.9 71.1 18.3 70.2 13.3 69.6 11.3 68.9 10.5 67.2 5.2 66.6 4.4 66.9 3.2" pathLength="1"/><path class="c" d="M62.4 3.8 63.0 4.0 62.6 6.1 63.7 7.6 65.2 18.2 68.8 30.7 68.0 34.3 70.2 43.7 72.7 48.9 75.8 50.9 80.0 65.8" pathLength="1"/><path class="c" d="M57.7 10.8 57.7 8.0 57.1 6.1 55.0 5.9 52.0 6.5 52.3 9.1 53.6 10.1 55.0 11.1 57.6 12.1 57.7 10.8" pathLength="1"/><path class="c" d="M61.9 42.0 62.7 44.3 64.3 46.2 68.8 49.0 65.6 36.1 63.6 36.1 61.8 36.6 61.9 42.0" pathLength="1"/><path class="c" d="M79.4 67.4 75.1 52.4 71.6 50.1 66.0 34.7 63.0 34.0 62.5 33.3 61.8 22.6 60.2 14.0 60.1 5.1 58.6 4.4 57.8 4.4" pathLength="1"/><path class="c" d="M50.6 5.2 51.0 6.2 50.5 6.6 51.6 7.5 53.6 23.2 56.0 31.7 59.5 31.3 58.0 12.9 60.0 31.2 59.6 36.6 58.8 37.6 57.8 37.6 61.1 43.2 61.5 44.4 61.6 47.6 63.5 49.2 66.3 50.7 66.7 51.8 68.1 51.5 71.9 52.4 74.4 53.8 78.9 69.2" pathLength="1"/><path class="c" d="M47.0 5.7 46.4 6.9 42.9 7.9 43.6 8.8 48.9 11.9 50.3 13.6 51.3 22.8 53.5 28.1 53.8 30.1 54.6 31.8 54.4 33.2 55.5 36.4 53.6 36.9 55.7 39.6 57.1 39.7 58.0 40.9 58.6 43.8 60.1 47.7 59.1 48.0 60.8 50.5 62.2 51.8 66.0 53.8 70.1 54.1 73.7 55.3 76.6 65.9 77.0 69.1" pathLength="1"/><path class="c" d="M42.9 6.2 43.4 7.4 42.2 8.2 43.1 9.2 44.4 9.3 46.2 10.9 46.7 17.2 48.1 21.9 49.9 25.8 52.0 27.1 52.5 28.7 53.2 32.0 52.2 35.8 50.8 36.7 54.9 40.8 55.3 43.0 58.7 47.1 57.4 47.9 57.5 48.1 60.5 51.9 64.1 55.4 67.2 60.4 68.4 63.3 68.2 64.5 67.0 65.0 67.1 66.1 M67.4 66.2 68.6 64.7 68.6 63.2 66.3 57.2 66.6 56.5 70.7 56.8 73.2 58.2 74.5 63.3 75.0 68.6" pathLength="1"/><path class="c" d="M41.9 6.3 42.6 7.6 41.5 8.6 42.5 9.6 43.8 9.7 44.5 11.4 46.0 16.5 46.8 21.6 48.8 26.5 50.2 31.5 50.7 35.6 50.0 36.8 51.9 40.9 54.0 41.5 55.2 46.4 56.3 48.7 57.6 49.6 62.6 55.1 66.8 61.6 67.6 63.5 67.5 64.2 66.8 64.4 66.6 65.9 M67.8 66.3 68.6 65.3 70.1 66.1 71.0 67.3" pathLength="1"/><path class="c" d="M41.0 6.4 41.9 7.9 40.9 8.9 41.9 10.0 42.4 10.0 43.6 13.3 45.0 21.9 46.8 27.5 47.8 33.4 47.2 34.6 47.2 36.4 46.4 36.7 47.0 38.7 48.8 40.4 49.8 43.5 50.5 43.7 54.9 48.4 55.5 50.2 59.2 52.7 61.1 54.8 66.7 63.2 66.8 63.8 66.1 65.8" pathLength="1"/><path class="c" d="M40.1 6.5 41.2 8.2 40.2 9.2 42.9 15.4 44.0 22.4 46.1 28.8 45.0 33.7 45.4 36.7 44.9 37.1 45.0 39.0 46.4 40.2 47.5 44.6 52.5 49.9 53.1 51.2 55.6 53.0 57.6 53.6 59.4 54.8 61.4 57.2 66.1 64.4 65.7 65.6" pathLength="1"/><path class="c" d="M38.9 6.7 39.3 8.5 38.5 9.9 38.6 11.9 40.1 14.3 40.5 17.7 43.3 29.5 43.8 33.0 43.5 33.3 43.9 33.2 44.0 33.7 42.4 34.1 42.9 36.6 41.8 38.1 42.1 40.1 43.5 39.6 44.5 40.1 45.5 44.1 50.7 50.9 51.4 52.0 51.4 52.9 52.6 54.7 54.8 56.2 59.5 58.5 62.6 61.3 65.3 65.5" pathLength="1"/><path class="c" d="M37.3 6.8 37.5 8.4 37.0 11.3 38.3 12.4 39.2 14.6 39.6 18.3 41.3 24.0 42.3 29.3 41.2 32.4 41.2 34.2 40.3 34.4 41.8 36.5 41.9 37.6 39.9 38.8 40.4 40.2 42.5 40.5 44.0 42.7 44.1 44.2 46.3 47.3 51.1 53.1 53.4 56.5 62.6 64.7" pathLength="1"/><path class="c" d="M35.5 7.0 35.6 10.2 36.3 13.0 36.9 13.7 37.8 21.6 39.8 30.1 39.8 32.1 39.2 33.6 39.6 34.4 38.8 34.7 39.5 38.5 38.4 39.4 38.8 40.4 40.2 40.6 41.8 41.5 43.0 45.5 46.8 50.4 48.9 54.1 51.5 56.3 52.7 59.2 57.2 61.2 60.4 64.0" pathLength="1"/><path class="c" d="M33.7 7.4 34.5 12.4 35.7 14.2 35.4 17.1 35.8 19.2 38.2 28.2 38.1 30.4 38.7 32.5 38.6 33.5 37.2 34.0 36.4 35.8 37.2 37.1 37.1 39.2 36.3 40.0 41.4 43.5 42.1 46.1 45.2 51.0 45.9 52.7 51.9 60.4 53.7 61.8 56.3 62.0 57.3 62.4 58.1 63.3" pathLength="1"/><path class="c" d="M32.0 7.9 33.3 12.7 34.6 15.2 34.7 19.7 36.6 27.6 36.5 32.0 37.4 32.0 37.4 32.6 36.4 32.7 34.7 36.1 34.2 40.1 37.3 46.6 38.8 47.3 37.7 49.5 42.3 49.8 42.8 51.6 50.0 60.8" pathLength="1"/><path class="c" d="M30.4 8.4 31.2 11.3 32.3 18.8 33.1 20.5 33.5 23.9 34.4 26.5 35.6 28.4 35.3 30.9 35.8 31.6 35.3 32.0 34.7 31.4 30.9 41.9 32.2 47.0 33.2 49.3 41.0 52.0 45.7 56.5 48.4 60.3" pathLength="1"/><path class="c" d="M28.7 8.9 29.4 14.4 33.7 27.2 33.3 28.7 33.8 29.4 33.0 29.6 32.8 31.6 28.6 43.3 28.7 46.8 33.2 49.5 39.9 51.8 44.9 56.5 47.4 60.1" pathLength="1"/><path class="c" d="M26.7 9.4 26.0 10.2 26.9 15.4 28.4 16.5 30.2 21.6 30.3 23.1 31.8 25.2 32.2 26.6 31.2 28.4 31.0 30.9 28.3 38.2 28.3 46.8 33.1 49.8 39.1 51.8 44.1 56.4 46.3 59.8" pathLength="1"/><path class="c" d="M24.6 10.0 25.2 11.2 25.2 16.5 24.1 18.4 24.5 19.6 27.1 16.5 28.4 18.0 28.9 20.9 28.9 24.0 28.5 24.7 29.7 26.1 29.7 27.7 28.0 33.1 27.8 34.6 27.9 46.8 28.6 47.6 33.1 50.1 38.4 51.8 43.3 56.4 45.3 59.6" pathLength="1"/><path class="c" d="M23.4 10.3 24.2 11.8 24.3 16.2 23.2 18.3 23.8 19.7 25.8 20.6 27.2 23.9 27.2 25.6 28.0 26.7 27.2 32.7 27.5 46.8 28.5 47.8 33.0 50.4 37.6 51.9 42.5 56.3 44.3 59.3" pathLength="1"/><path class="c" d="M22.3 10.6 23.2 12.5 23.3 14.5 23.3 16.5 22.3 17.8 22.8 19.3 24.1 20.4 26.6 28.0 26.9 41.4 27.3 44.1 27.1 46.8 28.3 48.1 33.0 50.7 36.8 51.9 41.6 56.3 43.2 59.0" pathLength="1"/><path class="c" d="M21.2 10.9 22.3 13.4 22.3 16.5 21.5 17.7 21.9 18.9 23.0 19.8 23.7 22.8 23.7 24.3 24.5 24.9 25.2 28.1 24.9 28.6 26.4 31.0 26.5 40.9 27.0 44.1 26.7 44.7 26.7 46.8 28.1 48.3 33.0 50.9 36.1 52.0 40.8 56.2 42.1 58.7" pathLength="1"/><path class="c" d="M20.0 11.2 21.3 13.7 21.3 16.5 20.7 17.7 21.0 18.5 21.9 19.2 22.3 21.5 23.0 22.6 22.9 24.3 23.5 24.8 23.9 26.2 24.0 26.7 23.2 27.1 26.0 32.0 26.1 40.5 26.6 44.4 26.3 45.0 26.3 46.8 28.0 48.6 30.3 49.5 32.9 51.2 35.3 52.0 40.0 56.2 41.1 58.5" pathLength="1"/><path class="c" d="M18.9 11.5 20.3 14.3 20.3 16.6 19.8 17.3 20.8 18.7 21.7 22.5 21.7 24.5 22.4 25.9 22.5 27.4 23.8 29.2 25.6 32.9 25.7 40.0 26.3 44.5 25.9 45.3 25.9 46.8 27.8 48.8 34.6 52.0 38.9 55.9 39.7 58.1" pathLength="1"/><path class="c" d="M17.7 11.8 19.3 15.0 19.3 16.6 19.0 17.1 19.7 18.1 20.2 21.4 19.5 23.6 20.2 24.4 21.3 24.5 21.1 25.7 21.7 27.7 22.8 29.0 25.2 33.9 25.2 39.5 26.0 44.2 25.5 46.8 27.7 49.1 30.0 49.9 34.0 52.2 37.0 55.1 37.7 57.6" pathLength="1"/><path class="c" d="M16.6 12.2 18.4 15.6 18.1 16.9 18.6 17.6 18.9 19.6 18.3 21.5 19.1 23.4 19.5 25.9 20.6 26.3 21.0 27.9 21.9 28.8 24.8 34.8 24.8 39.0 25.7 44.9 25.1 45.9 25.1 46.8 27.5 49.3 30.2 50.3 34.4 53.4 35.4 54.8 35.8 57.2" pathLength="1"/><path class="c" d="M15.5 12.5 17.4 16.2 17.6 17.9 17.0 20.0 18.6 23.9 18.8 27.0 22.3 31.6 24.4 35.8 24.4 38.6 25.3 44.8 24.7 46.8 27.4 49.6 30.7 50.9 32.4 56.3" pathLength="1"/><path class="c" d="M29.0 55.4 28.0 51.6 26.9 49.5 24.3 46.8 25.0 44.9 24.0 36.8 22.8 34.4 18.3 28.8 17.7 26.5 16.7 25.1 16.9 22.1 15.5 18.1 15.7 15.5 14.3 12.8" pathLength="1"/><path class="c" d="M23.8 55.0 25.9 54.7 M26.3 54.8 25.7 50.4 23.9 46.8 24.7 45.8 24.7 45.1 23.5 37.8 17.4 29.5 17.0 27.0 13.9 22.1 15.0 19.6 14.9 18.4 12.8 13.2" pathLength="1"/><path class="c" d="M17.7 54.8 19.0 54.4 23.4 50.9 23.2 46.5 24.2 46.0 22.3 40.4 20.0 35.2 16.7 29.9 16.3 27.5 12.4 21.6 12.8 19.9 13.9 17.4 12.2 13.3" pathLength="1"/><path class="c" d="M17.8 53.2 21.8 50.4 19.7 49.2 18.1 52.0 17.8 53.2" pathLength="1"/><path class="b" d="M2.0 16.1 4.6 15.4 28.5 9.0 34.5 7.1 46.0 5.9 51.7 5.0 58.6 4.3 76.5 2.0 78.3 10.7 81.0 33.6 81.3 37.7 83.7 54.4 78.7 69.7 49.1 60.5 26.1 54.7 23.7 55.0 20.7 54.9 19.6 55.0 18.2 54.9 15.2 54.4 14.1 48.6 13.4 46.2 10.6 36.0 8.6 29.9 6.6 25.1 5.2 22.0 2.0 16.1Z" pathLength="1"/></svg>
-    <div class="ld-cap" aria-hidden="true"><div class="ld-name">Nyanyi</div><div class="ld-coords">8°35′35″ S &nbsp;·&nbsp; 115°07′26″ E</div></div>
+    <div class="ld-map" style="aspect-ratio:86/72"><svg class="c" style="--i:0" viewBox="0 0 86 72" preserveAspectRatio="xMidYMid meet" aria-hidden="true"><path d="M82.1 59.4 81.0 54.4 80.9 50.6 79.1 44.1 78.2 33.3 78.4 32.5 79.4 32.1 78.6 22.1 76.8 13.6 77.1 10.2 75.7 2.9 75.2 2.2"/><path d="M73.4 2.4 74.5 4.2 75.6 9.5 75.1 14.8 75.3 19.0 76.5 24.3 76.7 28.6 77.8 30.8 77.0 32.5 79.1 53.3 81.5 61.0"/><path d="M77.3 45.7 77.6 45.6 77.4 44.8 77.4 45.5 77.3 45.7"/><path d="M81.0 62.6 79.3 57.8 77.6 49.9 78.1 46.5 76.1 32.0 76.2 28.5 74.3 24.3 74.5 16.0 73.7 12.6 72.8 4.7 71.6 2.6"/><path d="M80.5 64.2 79.2 60.4 76.6 49.4 73.8 47.4 73.5 46.9 75.3 37.2 72.4 32.0 72.5 27.9 71.0 22.9 71.1 18.3 70.2 13.3 69.6 11.3 68.9 10.5 67.2 5.2 66.6 4.4 66.9 3.2"/><path d="M62.4 3.8 63.0 4.0 62.6 6.1 63.7 7.6 65.2 18.2 68.8 30.7 68.0 34.3 70.2 43.7 72.7 48.9 75.8 50.9 80.0 65.8"/></svg><svg class="c" style="--i:1" viewBox="0 0 86 72" preserveAspectRatio="xMidYMid meet" aria-hidden="true"><path d="M57.7 10.8 57.7 8.0 57.1 6.1 55.0 5.9 52.0 6.5 52.3 9.1 53.6 10.1 55.0 11.1 57.6 12.1 57.7 10.8"/><path d="M61.9 42.0 62.7 44.3 64.3 46.2 68.8 49.0 65.6 36.1 63.6 36.1 61.8 36.6 61.9 42.0"/><path d="M79.4 67.4 75.1 52.4 71.6 50.1 66.0 34.7 63.0 34.0 62.5 33.3 61.8 22.6 60.2 14.0 60.1 5.1 58.6 4.4 57.8 4.4"/><path d="M50.6 5.2 51.0 6.2 50.5 6.6 51.6 7.5 53.6 23.2 56.0 31.7 59.5 31.3 58.0 12.9 60.0 31.2 59.6 36.6 58.8 37.6 57.8 37.6 61.1 43.2 61.5 44.4 61.6 47.6 63.5 49.2 66.3 50.7 66.7 51.8 68.1 51.5 71.9 52.4 74.4 53.8 78.9 69.2"/><path d="M47.0 5.7 46.4 6.9 42.9 7.9 43.6 8.8 48.9 11.9 50.3 13.6 51.3 22.8 53.5 28.1 53.8 30.1 54.6 31.8 54.4 33.2 55.5 36.4 53.6 36.9 55.7 39.6 57.1 39.7 58.0 40.9 58.6 43.8 60.1 47.7 59.1 48.0 60.8 50.5 62.2 51.8 66.0 53.8 70.1 54.1 73.7 55.3 76.6 65.9 77.0 69.1"/><path d="M42.9 6.2 43.4 7.4 42.2 8.2 43.1 9.2 44.4 9.3 46.2 10.9 46.7 17.2 48.1 21.9 49.9 25.8 52.0 27.1 52.5 28.7 53.2 32.0 52.2 35.8 50.8 36.7 54.9 40.8 55.3 43.0 58.7 47.1 57.4 47.9 57.5 48.1 60.5 51.9 64.1 55.4 67.2 60.4 68.4 63.3 68.2 64.5 67.0 65.0 67.1 66.1 M67.4 66.2 68.6 64.7 68.6 63.2 66.3 57.2 66.6 56.5 70.7 56.8 73.2 58.2 74.5 63.3 75.0 68.6"/></svg><svg class="c" style="--i:2" viewBox="0 0 86 72" preserveAspectRatio="xMidYMid meet" aria-hidden="true"><path d="M41.9 6.3 42.6 7.6 41.5 8.6 42.5 9.6 43.8 9.7 44.5 11.4 46.0 16.5 46.8 21.6 48.8 26.5 50.2 31.5 50.7 35.6 50.0 36.8 51.9 40.9 54.0 41.5 55.2 46.4 56.3 48.7 57.6 49.6 62.6 55.1 66.8 61.6 67.6 63.5 67.5 64.2 66.8 64.4 66.6 65.9 M67.8 66.3 68.6 65.3 70.1 66.1 71.0 67.3"/><path d="M41.0 6.4 41.9 7.9 40.9 8.9 41.9 10.0 42.4 10.0 43.6 13.3 45.0 21.9 46.8 27.5 47.8 33.4 47.2 34.6 47.2 36.4 46.4 36.7 47.0 38.7 48.8 40.4 49.8 43.5 50.5 43.7 54.9 48.4 55.5 50.2 59.2 52.7 61.1 54.8 66.7 63.2 66.8 63.8 66.1 65.8"/><path d="M40.1 6.5 41.2 8.2 40.2 9.2 42.9 15.4 44.0 22.4 46.1 28.8 45.0 33.7 45.4 36.7 44.9 37.1 45.0 39.0 46.4 40.2 47.5 44.6 52.5 49.9 53.1 51.2 55.6 53.0 57.6 53.6 59.4 54.8 61.4 57.2 66.1 64.4 65.7 65.6"/><path d="M38.9 6.7 39.3 8.5 38.5 9.9 38.6 11.9 40.1 14.3 40.5 17.7 43.3 29.5 43.8 33.0 43.5 33.3 43.9 33.2 44.0 33.7 42.4 34.1 42.9 36.6 41.8 38.1 42.1 40.1 43.5 39.6 44.5 40.1 45.5 44.1 50.7 50.9 51.4 52.0 51.4 52.9 52.6 54.7 54.8 56.2 59.5 58.5 62.6 61.3 65.3 65.5"/><path d="M37.3 6.8 37.5 8.4 37.0 11.3 38.3 12.4 39.2 14.6 39.6 18.3 41.3 24.0 42.3 29.3 41.2 32.4 41.2 34.2 40.3 34.4 41.8 36.5 41.9 37.6 39.9 38.8 40.4 40.2 42.5 40.5 44.0 42.7 44.1 44.2 46.3 47.3 51.1 53.1 53.4 56.5 62.6 64.7"/><path d="M35.5 7.0 35.6 10.2 36.3 13.0 36.9 13.7 37.8 21.6 39.8 30.1 39.8 32.1 39.2 33.6 39.6 34.4 38.8 34.7 39.5 38.5 38.4 39.4 38.8 40.4 40.2 40.6 41.8 41.5 43.0 45.5 46.8 50.4 48.9 54.1 51.5 56.3 52.7 59.2 57.2 61.2 60.4 64.0"/></svg><svg class="c" style="--i:3" viewBox="0 0 86 72" preserveAspectRatio="xMidYMid meet" aria-hidden="true"><path d="M33.7 7.4 34.5 12.4 35.7 14.2 35.4 17.1 35.8 19.2 38.2 28.2 38.1 30.4 38.7 32.5 38.6 33.5 37.2 34.0 36.4 35.8 37.2 37.1 37.1 39.2 36.3 40.0 41.4 43.5 42.1 46.1 45.2 51.0 45.9 52.7 51.9 60.4 53.7 61.8 56.3 62.0 57.3 62.4 58.1 63.3"/><path d="M32.0 7.9 33.3 12.7 34.6 15.2 34.7 19.7 36.6 27.6 36.5 32.0 37.4 32.0 37.4 32.6 36.4 32.7 34.7 36.1 34.2 40.1 37.3 46.6 38.8 47.3 37.7 49.5 42.3 49.8 42.8 51.6 50.0 60.8"/><path d="M30.4 8.4 31.2 11.3 32.3 18.8 33.1 20.5 33.5 23.9 34.4 26.5 35.6 28.4 35.3 30.9 35.8 31.6 35.3 32.0 34.7 31.4 30.9 41.9 32.2 47.0 33.2 49.3 41.0 52.0 45.7 56.5 48.4 60.3"/><path d="M28.7 8.9 29.4 14.4 33.7 27.2 33.3 28.7 33.8 29.4 33.0 29.6 32.8 31.6 28.6 43.3 28.7 46.8 33.2 49.5 39.9 51.8 44.9 56.5 47.4 60.1"/><path d="M26.7 9.4 26.0 10.2 26.9 15.4 28.4 16.5 30.2 21.6 30.3 23.1 31.8 25.2 32.2 26.6 31.2 28.4 31.0 30.9 28.3 38.2 28.3 46.8 33.1 49.8 39.1 51.8 44.1 56.4 46.3 59.8"/><path d="M24.6 10.0 25.2 11.2 25.2 16.5 24.1 18.4 24.5 19.6 27.1 16.5 28.4 18.0 28.9 20.9 28.9 24.0 28.5 24.7 29.7 26.1 29.7 27.7 28.0 33.1 27.8 34.6 27.9 46.8 28.6 47.6 33.1 50.1 38.4 51.8 43.3 56.4 45.3 59.6"/></svg><svg class="c" style="--i:4" viewBox="0 0 86 72" preserveAspectRatio="xMidYMid meet" aria-hidden="true"><path d="M23.4 10.3 24.2 11.8 24.3 16.2 23.2 18.3 23.8 19.7 25.8 20.6 27.2 23.9 27.2 25.6 28.0 26.7 27.2 32.7 27.5 46.8 28.5 47.8 33.0 50.4 37.6 51.9 42.5 56.3 44.3 59.3"/><path d="M22.3 10.6 23.2 12.5 23.3 14.5 23.3 16.5 22.3 17.8 22.8 19.3 24.1 20.4 26.6 28.0 26.9 41.4 27.3 44.1 27.1 46.8 28.3 48.1 33.0 50.7 36.8 51.9 41.6 56.3 43.2 59.0"/><path d="M21.2 10.9 22.3 13.4 22.3 16.5 21.5 17.7 21.9 18.9 23.0 19.8 23.7 22.8 23.7 24.3 24.5 24.9 25.2 28.1 24.9 28.6 26.4 31.0 26.5 40.9 27.0 44.1 26.7 44.7 26.7 46.8 28.1 48.3 33.0 50.9 36.1 52.0 40.8 56.2 42.1 58.7"/><path d="M20.0 11.2 21.3 13.7 21.3 16.5 20.7 17.7 21.0 18.5 21.9 19.2 22.3 21.5 23.0 22.6 22.9 24.3 23.5 24.8 23.9 26.2 24.0 26.7 23.2 27.1 26.0 32.0 26.1 40.5 26.6 44.4 26.3 45.0 26.3 46.8 28.0 48.6 30.3 49.5 32.9 51.2 35.3 52.0 40.0 56.2 41.1 58.5"/><path d="M18.9 11.5 20.3 14.3 20.3 16.6 19.8 17.3 20.8 18.7 21.7 22.5 21.7 24.5 22.4 25.9 22.5 27.4 23.8 29.2 25.6 32.9 25.7 40.0 26.3 44.5 25.9 45.3 25.9 46.8 27.8 48.8 34.6 52.0 38.9 55.9 39.7 58.1"/><path d="M17.7 11.8 19.3 15.0 19.3 16.6 19.0 17.1 19.7 18.1 20.2 21.4 19.5 23.6 20.2 24.4 21.3 24.5 21.1 25.7 21.7 27.7 22.8 29.0 25.2 33.9 25.2 39.5 26.0 44.2 25.5 46.8 27.7 49.1 30.0 49.9 34.0 52.2 37.0 55.1 37.7 57.6"/></svg><svg class="c" style="--i:5" viewBox="0 0 86 72" preserveAspectRatio="xMidYMid meet" aria-hidden="true"><path d="M16.6 12.2 18.4 15.6 18.1 16.9 18.6 17.6 18.9 19.6 18.3 21.5 19.1 23.4 19.5 25.9 20.6 26.3 21.0 27.9 21.9 28.8 24.8 34.8 24.8 39.0 25.7 44.9 25.1 45.9 25.1 46.8 27.5 49.3 30.2 50.3 34.4 53.4 35.4 54.8 35.8 57.2"/><path d="M15.5 12.5 17.4 16.2 17.6 17.9 17.0 20.0 18.6 23.9 18.8 27.0 22.3 31.6 24.4 35.8 24.4 38.6 25.3 44.8 24.7 46.8 27.4 49.6 30.7 50.9 32.4 56.3"/><path d="M29.0 55.4 28.0 51.6 26.9 49.5 24.3 46.8 25.0 44.9 24.0 36.8 22.8 34.4 18.3 28.8 17.7 26.5 16.7 25.1 16.9 22.1 15.5 18.1 15.7 15.5 14.3 12.8"/><path d="M23.8 55.0 25.9 54.7 M26.3 54.8 25.7 50.4 23.9 46.8 24.7 45.8 24.7 45.1 23.5 37.8 17.4 29.5 17.0 27.0 13.9 22.1 15.0 19.6 14.9 18.4 12.8 13.2"/><path d="M17.7 54.8 19.0 54.4 23.4 50.9 23.2 46.5 24.2 46.0 22.3 40.4 20.0 35.2 16.7 29.9 16.3 27.5 12.4 21.6 12.8 19.9 13.9 17.4 12.2 13.3"/><path d="M17.8 53.2 21.8 50.4 19.7 49.2 18.1 52.0 17.8 53.2"/></svg><svg class="b" viewBox="0 0 86 72" preserveAspectRatio="xMidYMid meet" aria-hidden="true"><path d="M2.0 16.1 4.6 15.4 28.5 9.0 34.5 7.1 46.0 5.9 51.7 5.0 58.6 4.3 76.5 2.0 78.3 10.7 81.0 33.6 81.3 37.7 83.7 54.4 78.7 69.7 49.1 60.5 26.1 54.7 23.7 55.0 20.7 54.9 19.6 55.0 18.2 54.9 15.2 54.4 14.1 48.6 13.4 46.2 10.6 36.0 8.6 29.9 6.6 25.1 5.2 22.0 2.0 16.1Z"/></svg></div>
+    <div class="ld-cap" aria-hidden="true"><div class="ld-name"><span style="--i:0">N</span><span style="--i:1">y</span><span style="--i:2">a</span><span style="--i:3">n</span><span style="--i:4">y</span><span style="--i:5">i</span></div><div class="ld-coords">8°35′35″ S &nbsp;·&nbsp; 115°07′26″ E</div></div>
   </div>
-  <div class="ld-foot" aria-hidden="true"><div class="ld-bar"><i id="ldBar"></i></div><div class="ld-pct" id="ldPct">000</div></div>
+  <div class="ld-foot" aria-hidden="true"><div class="ld-bar"><i id="ldBar"></i></div></div>
 </div>
 <script>
-/* Preloader. The page registers what it needs with __ld.add(promise, weight); the contours draw with the real
-   progress (never faster than MIN on a first visit), and the curtain lifts when everything is in, or after MAX. */
+/* Preloader. The page registers what it must have with __ld.add(promise, weight). No per-frame JavaScript: the bar is
+   moved only when a task finishes (a CSS transition animates it), and the curtain lifts once everything is in and the
+   opening choreography has played (MIN), or after MAX. */
 (function(){
   "use strict";
-  const el = document.getElementById('loader'), root = document.documentElement;
+  const el = document.getElementById('loader'), root = document.documentElement, bar = document.getElementById('ldBar');
   const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
   let seen = false; try { seen = sessionStorage.getItem('ny-seen') === '1'; } catch (e) {}
-  const MIN = reduce ? 300 : seen ? 900 : 2600, MAX = 10000, t0 = performance.now();
+  const MIN = reduce ? 300 : seen ? 1000 : 2500, MAX = 10000;
   root.classList.add('ld-lock');
-  const cs = [...el.querySelectorAll('.ld-map .c')], border = el.querySelector('.ld-map .b');
-  const bar = document.getElementById('ldBar'), pct = document.getElementById('ldPct');
-  let total = 0, done = 0, shown = 0, all = null, finished = false;
+  let total = 0, done = 0, finished = false, minPassed = false, allIn = false;
   const tasks = [];
-  window.__ld = {add(p, w = 1){ total += w; tasks.push(Promise.resolve(p).catch(() => {}).then(() => { done += w; })); }};
+  const setBar = () => { bar.style.transform = 'scaleX(' + Math.max(.04, total ? done / total : 0).toFixed(3) + ')'; };
+  window.__ld = {add(p, w = 1){ total += w; tasks.push(Promise.resolve(p).catch(() => {}).then(() => { done += w; setBar(); })); }};
   // the font stylesheet loads without blocking the first paint; wait for it before asking for any typeface
   window.__fontsCss = new Promise(r => { const t = performance.now(); (function poll(){ if ([...document.styleSheets].some(x => x.href && x.href.indexOf('fonts.googleapis') > 0) || performance.now() - t > 4000) r(); else setTimeout(poll, 40); })(); });
-  // the name appears once its typeface has arrived (no flash of a fallback font)
+  // the name's letters start rising once its typeface has arrived (no flash of a fallback font)
   const named = () => el.classList.add('named');
   if (document.fonts && document.fonts.load) Promise.race([window.__fontsCss.then(() => document.fonts.load('600 100px "Bodoni Moda"')), new Promise(r => setTimeout(r, 2600))]).then(named); else named();
-  function paint(p){
-    border.style.strokeDashoffset = 1 - Math.min(p * 2.2, 1);
-    const n = cs.length;
-    for (let i = 0; i < n; i++) { const a = .1 + i / n * .62, v = Math.min(Math.max((p - a) / .28, 0), 1); cs[i].style.strokeDashoffset = 1 - v; }
-    bar.style.transform = 'scaleX(' + p.toFixed(4) + ')';
-    pct.textContent = String(Math.round(p * 100)).padStart(3, '0');
-  }
-  let last = t0;
-  function frame(now){
-    if (finished) return;
-    const t = now - t0, real = total ? done / total : 0, pace = Math.min(t / MIN, 1);
-    const target = t > MAX ? 1 : Math.min(real, pace);
-    // eased by time, not by frames, so a busy or slow device does not stretch the animation
-    const dt = Math.min(now - last, 100); last = now;
-    shown += (target - shown) * (reduce ? 1 : 1 - Math.exp(-dt / 160));
-    if (target - shown < .008) shown = target;
-    paint(shown);
-    if (shown >= 1 && (all === 'done' || t > MAX)) return finish();
-    requestAnimationFrame(frame);
-  }
   function finish(){
-    finished = true; paint(1);
+    if (finished) return; finished = true;
+    bar.style.transform = 'scaleX(1)';
     try { sessionStorage.setItem('ny-seen', '1'); } catch (e) {}
     setTimeout(() => {
       el.classList.add('out'); root.classList.remove('ld-lock');
       document.dispatchEvent(new Event('ny:reveal'));
       setTimeout(() => el.remove(), 1300);
-    }, reduce ? 0 : 280);
+    }, reduce ? 0 : 450);
   }
-  // wait until the page has registered its assets (the page script runs before DOMContentLoaded)
-  document.addEventListener('DOMContentLoaded', () => { Promise.all(tasks).then(() => { all = 'done'; }); });
-  requestAnimationFrame(frame);
+  const check = () => { if (minPassed && allIn) finish(); };
+  setTimeout(() => { minPassed = true; check(); }, MIN);
+  setTimeout(finish, MAX);
+  // the page script runs before DOMContentLoaded, so by then every task is registered
+  document.addEventListener('DOMContentLoaded', () => { Promise.all(tasks).then(() => { allIn = true; check(); }); });
 })();
 </script>
 <nav class="nav" id="nav" aria-label="Sections">
@@ -902,7 +898,10 @@ LD.add(imgP(PORTRAIT ? 'media/poster-portrait.jpg' : 'media/poster.jpg'), 1); LD
 const hv = document.getElementById('heroVideo');
 if (matchMedia('(prefers-reduced-motion: reduce)').matches) hv.removeAttribute('autoplay');
 else {
-  hv.src = PORTRAIT ? 'media/hero-portrait.mp4' : innerWidth < 900 ? 'media/hero-720.mp4' : 'media/hero.mp4'; hv.play().catch(() => {});
+  // behind the preloader the video only buffers (decoding it there would compete with the animation); it plays at the reveal
+  const heroSrc = PORTRAIT ? 'media/hero-portrait.mp4' : innerWidth < 900 ? 'media/hero-720.mp4' : 'media/hero.mp4';
+  if (window.__ld) { hv.removeAttribute('autoplay'); hv.autoplay = false; }
+  hv.src = heroSrc; if (!window.__ld) hv.play().catch(() => {});
   LD.add(new Promise(r => { if (hv.readyState >= 3) return r(); hv.addEventListener('canplaythrough', r, {once: true}); hv.addEventListener('error', r, {once: true}); setTimeout(r, 7000); }), 2);
   // the loop fades in from ink: start it from the top as the curtain lifts
   document.addEventListener('ny:reveal', () => { try { hv.currentTime = 0; } catch (e) {} hv.play().catch(() => {}); });
@@ -1181,19 +1180,30 @@ showFrame(0);
 /* ---- live 3D upgrade (only with hardware-accelerated WebGL) ---- */
 function fastGL(){ try { const c = document.createElement('canvas'), o = {failIfMajorPerformanceCaveat: true}; return !!(c.getContext('webgl2', o) || c.getContext('webgl', o)); } catch (e) { return false; } }
 function loadScript(src){ return new Promise((res, rej) => { const el = document.createElement('script'); el.src = src; el.onload = res; el.onerror = rej; document.head.appendChild(el); }); }
+// idle-time scheduling: heavy work runs in slices when the page is quiet, never during the preloader or the curtain
+const idle = fn => new Promise(r => { const run = () => { fn(); r(); }; ('requestIdleCallback' in window) ? requestIdleCallback(run, {timeout: 1200}) : setTimeout(run, 60); });
+const afterReveal = () => new Promise(r => { if (!document.getElementById('loader')) return r(); document.addEventListener('ny:reveal', () => setTimeout(r, 1400), {once: true}); });
+const preload = href => fetch(href, {mode: 'no-cors'}).catch(() => {});   // warms the HTTP cache; the <script> tag later reads it from there
+const THREE_JS = 'https://cdn.jsdelivr.net/npm/three@0.147.0/build/three.min.js', ORBIT_JS = 'https://cdn.jsdelivr.net/npm/three@0.147.0/examples/js/controls/OrbitControls.js';
 // if the live model fails, fall back to the image turntables (fetched only then)
 function toImages(){ live = false; viewer.classList.remove('live'); cLive = false; cStage.classList.remove('live'); loadSpin().then(() => showFrame(frameI)); if (CNF) cFrames(cCur); startAuto(); }
-if (WANT_LIVE) LD.add(loadScript('https://cdn.jsdelivr.net/npm/three@0.147.0/build/three.min.js')
-  .then(() => loadScript('https://cdn.jsdelivr.net/npm/three@0.147.0/examples/js/controls/OrbitControls.js'))
-  .then(() => {
-    try { init3D(); }
-    catch (err) {
-      console.warn('Live 3D unavailable; keeping the image model.', err);
-      [stage, cStage].forEach(st => { const c = st.querySelector('canvas'); if (c) c.remove(); });
-      toImages();
-    }
-  })
-  .catch(() => toImages()), 3);
+if (WANT_LIVE) {
+  // a still of the model stands in until the live one is ready
+  spinImg.src = 'media/spin/f00.jpg'; LD.add(imgP('media/spin/f00.jpg'), 1);
+  // the scripts are only downloaded behind the preloader (no parsing, no WebGL); they run after the curtain
+  LD.add(Promise.all([preload(THREE_JS), preload(ORBIT_JS)]), 2);
+  afterReveal()
+    .then(() => loadScript(THREE_JS)).then(() => idle(() => {})).then(() => loadScript(ORBIT_JS))
+    .then(() => idle(() => {
+      try { init3D(); }
+      catch (err) {
+        console.warn('Live 3D unavailable; keeping the image model.', err);
+        [stage, cStage].forEach(st => { const c = st.querySelector('canvas'); if (c) c.remove(); });
+        toImages();
+      }
+    }))
+    .catch(() => toImages());
+}
 function init3D(){
 THREE.ColorManagement.legacyMode = false;
 const W = window.buildWorld(THREE, S, {lat: LAT, lon: LON});
@@ -1306,7 +1316,7 @@ controls.addEventListener('start', () => { controls.autoRotate = false; tween = 
 function resize(){ const w = stage.clientWidth, h = stage.clientHeight; renderer.setSize(w, h, false); camera.aspect = w/h; camera.updateProjectionMatrix(); }
 new ResizeObserver(resize).observe(stage); resize();
 paint(); goView('overview', true);
-renderer.compile(scene, camera); renderer.render(scene, camera);   // compile now, not on the first scroll into view
+idle(() => { renderer.compile(scene, camera); renderer.render(scene, camera); });   // compile in a quiet moment, not on the first scroll into view
 let visible = true; new IntersectionObserver(es => visible = es[0].isIntersecting).observe(stage);
 const ease = t => t < .5 ? 4*t*t*t : 1 - Math.pow(-2*t + 2, 3)/2, v3 = new THREE.Vector3(), dir = new THREE.Vector3();
 function frame(now){
@@ -1325,6 +1335,7 @@ requestAnimationFrame(frame);
 /* concept view: the same scene through a second renderer, with its own camera, clean clay terrain,
    no contours and a fixed afternoon sun; its state is swapped in only for its own render call */
 if (!CON) return;
+idle(() => {   // the concept view is built in its own slice
 const cR = new THREE.WebGLRenderer({antialias:true, alpha:true, powerPreference:'high-performance'});
 cR.setPixelRatio(Math.min(Math.max(devicePixelRatio, 1.5), 2));  // supersample: thin posts and mullions shimmer less
 cR.outputEncoding = THREE.sRGBEncoding;
@@ -1362,6 +1373,7 @@ function cResize(){ const w = cStage.clientWidth, h = cStage.clientHeight; cR.se
 new ResizeObserver(cResize).observe(cStage); cResize(); cCtl.update(); cRender();
 let cVis = false; new IntersectionObserver(es => cVis = es[0].isIntersecting).observe(cStage);
 (function cLoop(){ requestAnimationFrame(cLoop); if (!cVis || ROOT.classList.contains('ld-lock')) return; cCtl.update(); cRender(); })();
+});
 }
 /* ---------- phone revision: tap-to-open documents and questions, "Layers & sun", the sticky viewing button ---------- */
 (function(){
