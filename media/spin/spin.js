@@ -1,0 +1,1 @@
+window.SPIN={"frames": 40, "az0": 40.0};

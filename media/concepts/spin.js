@@ -1,0 +1,1 @@
+window.CSPIN={"frames": 36, "w": 1200, "h": 900};
