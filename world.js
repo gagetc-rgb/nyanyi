@@ -109,7 +109,8 @@ window.buildWorld = function (THREE, S, opt) {
     if (!k) return;
     const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3)); g.setIndex(idx);
     g.setAttribute('normal', new THREE.Float32BufferAttribute(pos.map((_, i) => i % 3 === 1 ? 1 : 0), 3));   // all up: one even colour
-    const m = new THREE.Mesh(g, new THREE.MeshStandardMaterial({color: '#8f866f', roughness: .9, metalness: 0, polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -2}));
+    // dark asphalt grey, so the road reads at a glance against the pale clay (user, 2026-09-28)
+    const m = new THREE.Mesh(g, new THREE.MeshStandardMaterial({color: '#1b1c1a', roughness: .8, metalness: 0, polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -2}));
     m.receiveShadow = true; grp('road').add(m);
   })();
 
@@ -118,7 +119,8 @@ window.buildWorld = function (THREE, S, opt) {
   const wGeo = new THREE.ShapeGeometry(shape); wGeo.rotateX(-Math.PI / 2);
   // one flat, matte colour, as on Kaba-Kaba (2026-09-27)
   const water = new THREE.Mesh(wGeo, new THREE.MeshStandardMaterial({color: '#3f9089', roughness: .6, metalness: 0, polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -2}));
-  water.position.y = S.bed.z + .55;   // above the levelled bed stones by the land edge (they sit at +.35), so no ties show water.receiveShadow = true; grp('river').add(water);
+  water.position.y = S.bed.z + .55;   // above the levelled bed stones by the land edge (they sit at +.35), so no ties show
+  water.receiveShadow = true; grp('river').add(water);
 
   /* contours, draped at their surveyed height */
   const cMaj = [], cMin = [];

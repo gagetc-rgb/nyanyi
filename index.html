@@ -117,6 +117,10 @@ section{padding-block:clamp(72px,10vw,140px)}
 .facts+.overview{margin-top:clamp(72px,9vw,130px)}
 @media (max-width:900px){.facts{grid-template-columns:1fr 1fr}.facts div:not(:nth-child(3n+1)){padding-left:0;border-left:0}.facts div:nth-child(even){padding-left:20px;border-left:1px solid var(--line)}}
 @media (max-width:520px){.facts{grid-template-columns:1fr}.facts div:nth-child(even){padding-left:0;border-left:0}}
+/* the bonus land in a warm brass wash (user, 2026-09-28) */
+.facts .gift{padding-right:24px;background:linear-gradient(160deg,rgba(176,144,92,.22),rgba(176,144,92,.08));box-shadow:inset 0 2px 0 var(--brass)}
+.facts .gift b{color:var(--brass-deep)}
+.facts .gift p{color:#5e4a2a}
 /* ---------- route ---------- */
 .route{margin-top:clamp(48px,6vw,80px);border-top:1px solid var(--line-ink)}
 .route h3{margin:28px 0 8px}
@@ -360,10 +364,24 @@ footer p{max-width:80ch}
 .hero .wrap{padding-block:104px 36px}
 .hero h1{font-size:min(12.2vw,24vh,190px);margin:14px 0 .24em}
 .hero .sub{font-size:clamp(19px,min(2vw,3.6vh),27px);max-width:36ch}
-.hero .figs{grid-template-columns:repeat(5,minmax(0,1fr));margin-top:clamp(24px,4.4vh,44px)}
+.hero .figs{grid-template-columns:repeat(4,minmax(0,1fr));margin-top:clamp(24px,4.4vh,44px)}
 .hero .figs b{font-size:clamp(22px,min(2.3vw,4.6vh),34px);white-space:nowrap}
 .hero .figs .gift b,.hero .figs .gift span{color:var(--brass-hi)}
+/* hero clean-up (user, 2026-09-28): four figures, the price set brighter, and the special price for both plots as
+   one warm, softly glowing line under them; no latitude/longitude on phones */
+.hero .figs .price b{color:#fff;font-weight:600;text-shadow:0 1px 18px rgba(10,13,11,.75)}
+.hero .figs .price span{color:#fff}
+.hero-special{display:inline-flex;align-items:baseline;gap:.4em;margin-top:clamp(18px,3.2vh,30px);font:italic 500 clamp(21px,min(2.3vw,4.4vh),32px)/1.2 var(--display);color:#ecd9b0;text-decoration:none;text-shadow:0 0 14px rgba(236,217,176,.55),0 0 38px rgba(214,189,142,.35),0 1px 14px rgba(10,13,11,.7);transition:color .3s,text-shadow .3s}
+.hero-special i{font-style:normal;transition:transform .3s}
+.hero-special:hover{color:#fff4dc;text-shadow:0 0 18px rgba(236,217,176,.75),0 0 48px rgba(214,189,142,.45),0 1px 14px rgba(10,13,11,.7)}
+.hero-special:hover i{transform:translateX(5px)}
+.hero .wrap>:nth-child(5){transition-delay:1s}
+.ld-coords .pl{display:none}
 @media (max-width:760px){
+  .hero .coords .ll,.ld-coords .ll{display:none}
+  .ld-coords .pl{display:inline}
+  .hero .coords{font-size:11px;letter-spacing:.14em}
+  .hero-special{font-size:min(4.6vw,22px);white-space:nowrap}
   .hero .wrap{padding-block:96px 28px}
   .hero h1{font-size:min(19vw,15vh)}
   .hero .figs{grid-template-columns:1fr 1fr;margin-top:22px}
@@ -395,7 +413,9 @@ footer p{max-width:80ch}
 .stops li p{font-size:15px;color:var(--muted);margin-top:6px;max-width:44ch}
 
 /* ---------- phone revision (user, 2026-09-27): one block ≈ one screen ---------- */
-.more-btn{display:none}
+.dock{display:none}
+@keyframes dockIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){.panel>div{animation:none!important}}
 .qa{all:unset;cursor:default}
 .stick{display:none}
 @media (max-width:760px){
@@ -412,19 +432,46 @@ footer p{max-width:80ch}
   .plotpick .k{font-size:9px;letter-spacing:.1em}
   .plotpick b{font-size:15px;letter-spacing:-.01em;white-space:nowrap}
   .plotpick span:not(.k){display:none}
-  .special{padding:14px 16px}
-  .special b{font-size:22px}
-  /* model: the model and its main controls on one screen; layers and sun on request */
-  .stage{height:56vh!important;min-height:330px!important}
-  .panel{display:flex!important;flex-direction:column;gap:14px;padding:14px 16px}
-  .panel h4{margin-bottom:8px}
-  .seg.views{grid-template-columns:repeat(4,1fr)}
-  .seg.views button{padding:9px 2px;font-size:11px}
-  .more-btn{display:block;align-self:start;font:500 11px/1 var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--stone);background:transparent;border:1px solid var(--line-ink);border-radius:999px;padding:10px 14px;cursor:pointer}
-  .more-btn[aria-expanded="true"]{border-color:var(--brass);color:var(--brass-hi)}
-  .viewer:not(.live) .more-btn{display:none}
-  .panel:not(.more) #lyrBlock,.panel:not(.more) #sunBlock{display:none}
-  .panel-foot{gap:12px}
+  .special{padding:10px 14px;gap:4px 12px;margin-bottom:16px}
+  .special span{font-size:10px}
+  .special b{font-size:19px}
+  /* model (2026-09-28, from Kaba-Kaba): the model fills the screen under the plot switch; its controls sit in a
+     translucent dock at the foot of the model and open one group at a time over it, so nothing needs scrolling */
+  .viewer{display:block;position:relative}
+  .stage{height:calc(100svh - env(safe-area-inset-top,0px) - env(safe-area-inset-bottom,0px) - 236px)!important;min-height:420px!important;max-height:760px}
+  .readout{left:10px;top:10px;right:auto;min-width:0;padding:9px 12px;background:rgba(17,22,18,.5)}
+  .readout b{font-size:16px;margin-bottom:3px}
+  .readout .row{font-size:10.5px;gap:14px}
+  .compass{right:10px;top:10px;width:40px;height:40px;background:rgba(17,22,18,.42)}
+  .compass svg{width:26px;height:26px}
+  .grab{top:58px;bottom:auto;right:10px;height:40px;padding:0 14px 0 11px;font-size:10px}
+  .grab svg{width:19px;height:19px}
+  .hint{left:auto;right:10px;bottom:auto;top:106px;font-size:10px}
+  .viewer.dock-open .hint{display:none}
+  .panel{position:absolute;left:10px;right:10px;bottom:62px;z-index:5;display:block!important;padding:0;border:0;background:none;pointer-events:none}
+  .panel>div{display:none;pointer-events:auto;padding:12px 12px 10px;border-radius:14px;border:1px solid rgba(228,227,220,.16);background:rgba(17,22,18,.58);-webkit-backdrop-filter:blur(12px) saturate(1.1);backdrop-filter:blur(12px) saturate(1.1);animation:dockIn .32s cubic-bezier(.2,.7,.2,1)}
+  .panel>div.open{display:block}
+  .viewer:not(.live) .panel>div.live-only{display:none}
+  .panel h4{display:none}
+  .panel .seg,.panel .seg.views{display:flex;gap:6px;border:0;padding:0;border-radius:0;overflow-x:auto;scrollbar-width:none}
+  .panel .seg::-webkit-scrollbar{display:none}
+  .panel .seg button,.panel .seg.views button{flex:none;min-height:36px;padding:0 14px;border-radius:999px;border:1px solid rgba(228,227,220,.18);color:var(--stone);font-size:12.5px;background:rgba(17,22,18,.25)}
+  .panel .seg button[aria-pressed="true"]{border-color:var(--stone);background:var(--stone);color:var(--ink)}
+  .panel .toggles{display:flex;flex-wrap:wrap;gap:6px}
+  .panel .toggle{flex:none;min-height:36px;padding:0 12px 0 10px;gap:8px;border-radius:999px;border:1px solid rgba(228,227,220,.18);font-size:12.5px;white-space:nowrap}
+  .panel .toggle i{display:none}
+  .panel .legend{display:grid;grid-template-columns:1fr 1fr;gap:6px 12px;margin-top:10px!important;font-size:10.5px;color:rgba(228,227,220,.8)}
+  .panel .legend i{width:14px;height:8px}
+  .panel .sun label{font-size:11px;margin-bottom:4px}
+  .panel .sun label[for=sunMonth]{margin-top:10px!important}
+  .panel .sun .meta{font-size:10px;margin-top:6px;color:rgba(228,227,220,.7)}
+  .dock{position:absolute;left:10px;right:10px;bottom:10px;z-index:6;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));height:44px;padding:3px;border-radius:999px;border:1px solid rgba(228,227,220,.16);background:rgba(17,22,18,.58);-webkit-backdrop-filter:blur(12px) saturate(1.1);backdrop-filter:blur(12px) saturate(1.1)}
+  .viewer:not(.live) .dock{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .viewer:not(.live) .dock .live-only{display:none}
+  .dock button{border:0;border-radius:999px;background:transparent;color:rgba(228,227,220,.82);font:500 10.5px/1 var(--mono);letter-spacing:.12em;text-transform:uppercase;cursor:pointer;transition:background .25s,color .25s}
+  .dock button[aria-expanded="true"]{background:rgba(228,227,220,.92);color:var(--ink)}
+  .viewer+.panel-foot{margin-top:14px;gap:12px}
+  .viewer+.panel-foot .provenance{font-size:11.5px;padding-top:12px}
   /* documents and questions: titles first, details on tap */
   .doc{cursor:pointer}
   .doc:not(.open) p:not(.meta){display:none}
@@ -490,7 +537,7 @@ html.ld-lock .hero .wrap>*{opacity:0;transform:translateY(26px)}
 <div class="ld" id="loader" role="status" aria-label="Loading">
   <div class="ld-in">
     <div class="ld-map" style="aspect-ratio:86/72"><svg class="c" style="--i:0" viewBox="0 0 86 72" preserveAspectRatio="xMidYMid meet" aria-hidden="true"><path d="M82.1 59.4 81.0 54.4 80.9 50.6 79.1 44.1 78.2 33.3 78.4 32.5 79.4 32.1 78.6 22.1 76.8 13.6 77.1 10.2 75.7 2.9 75.2 2.2"/><path d="M73.4 2.4 74.5 4.2 75.6 9.5 75.1 14.8 75.3 19.0 76.5 24.3 76.7 28.6 77.8 30.8 77.0 32.5 79.1 53.3 81.5 61.0"/><path d="M77.3 45.7 77.6 45.6 77.4 44.8 77.4 45.5 77.3 45.7"/><path d="M81.0 62.6 79.3 57.8 77.6 49.9 78.1 46.5 76.1 32.0 76.2 28.5 74.3 24.3 74.5 16.0 73.7 12.6 72.8 4.7 71.6 2.6"/><path d="M80.5 64.2 79.2 60.4 76.6 49.4 73.8 47.4 73.5 46.9 75.3 37.2 72.4 32.0 72.5 27.9 71.0 22.9 71.1 18.3 70.2 13.3 69.6 11.3 68.9 10.5 67.2 5.2 66.6 4.4 66.9 3.2"/><path d="M62.4 3.8 63.0 4.0 62.6 6.1 63.7 7.6 65.2 18.2 68.8 30.7 68.0 34.3 70.2 43.7 72.7 48.9 75.8 50.9 80.0 65.8"/></svg><svg class="c" style="--i:1" viewBox="0 0 86 72" preserveAspectRatio="xMidYMid meet" aria-hidden="true"><path d="M57.7 10.8 57.7 8.0 57.1 6.1 55.0 5.9 52.0 6.5 52.3 9.1 53.6 10.1 55.0 11.1 57.6 12.1 57.7 10.8"/><path d="M61.9 42.0 62.7 44.3 64.3 46.2 68.8 49.0 65.6 36.1 63.6 36.1 61.8 36.6 61.9 42.0"/><path d="M79.4 67.4 75.1 52.4 71.6 50.1 66.0 34.7 63.0 34.0 62.5 33.3 61.8 22.6 60.2 14.0 60.1 5.1 58.6 4.4 57.8 4.4"/><path d="M50.6 5.2 51.0 6.2 50.5 6.6 51.6 7.5 53.6 23.2 56.0 31.7 59.5 31.3 58.0 12.9 60.0 31.2 59.6 36.6 58.8 37.6 57.8 37.6 61.1 43.2 61.5 44.4 61.6 47.6 63.5 49.2 66.3 50.7 66.7 51.8 68.1 51.5 71.9 52.4 74.4 53.8 78.9 69.2"/><path d="M47.0 5.7 46.4 6.9 42.9 7.9 43.6 8.8 48.9 11.9 50.3 13.6 51.3 22.8 53.5 28.1 53.8 30.1 54.6 31.8 54.4 33.2 55.5 36.4 53.6 36.9 55.7 39.6 57.1 39.7 58.0 40.9 58.6 43.8 60.1 47.7 59.1 48.0 60.8 50.5 62.2 51.8 66.0 53.8 70.1 54.1 73.7 55.3 76.6 65.9 77.0 69.1"/><path d="M42.9 6.2 43.4 7.4 42.2 8.2 43.1 9.2 44.4 9.3 46.2 10.9 46.7 17.2 48.1 21.9 49.9 25.8 52.0 27.1 52.5 28.7 53.2 32.0 52.2 35.8 50.8 36.7 54.9 40.8 55.3 43.0 58.7 47.1 57.4 47.9 57.5 48.1 60.5 51.9 64.1 55.4 67.2 60.4 68.4 63.3 68.2 64.5 67.0 65.0 67.1 66.1 M67.4 66.2 68.6 64.7 68.6 63.2 66.3 57.2 66.6 56.5 70.7 56.8 73.2 58.2 74.5 63.3 75.0 68.6"/></svg><svg class="c" style="--i:2" viewBox="0 0 86 72" preserveAspectRatio="xMidYMid meet" aria-hidden="true"><path d="M41.9 6.3 42.6 7.6 41.5 8.6 42.5 9.6 43.8 9.7 44.5 11.4 46.0 16.5 46.8 21.6 48.8 26.5 50.2 31.5 50.7 35.6 50.0 36.8 51.9 40.9 54.0 41.5 55.2 46.4 56.3 48.7 57.6 49.6 62.6 55.1 66.8 61.6 67.6 63.5 67.5 64.2 66.8 64.4 66.6 65.9 M67.8 66.3 68.6 65.3 70.1 66.1 71.0 67.3"/><path d="M41.0 6.4 41.9 7.9 40.9 8.9 41.9 10.0 42.4 10.0 43.6 13.3 45.0 21.9 46.8 27.5 47.8 33.4 47.2 34.6 47.2 36.4 46.4 36.7 47.0 38.7 48.8 40.4 49.8 43.5 50.5 43.7 54.9 48.4 55.5 50.2 59.2 52.7 61.1 54.8 66.7 63.2 66.8 63.8 66.1 65.8"/><path d="M40.1 6.5 41.2 8.2 40.2 9.2 42.9 15.4 44.0 22.4 46.1 28.8 45.0 33.7 45.4 36.7 44.9 37.1 45.0 39.0 46.4 40.2 47.5 44.6 52.5 49.9 53.1 51.2 55.6 53.0 57.6 53.6 59.4 54.8 61.4 57.2 66.1 64.4 65.7 65.6"/><path d="M38.9 6.7 39.3 8.5 38.5 9.9 38.6 11.9 40.1 14.3 40.5 17.7 43.3 29.5 43.8 33.0 43.5 33.3 43.9 33.2 44.0 33.7 42.4 34.1 42.9 36.6 41.8 38.1 42.1 40.1 43.5 39.6 44.5 40.1 45.5 44.1 50.7 50.9 51.4 52.0 51.4 52.9 52.6 54.7 54.8 56.2 59.5 58.5 62.6 61.3 65.3 65.5"/><path d="M37.3 6.8 37.5 8.4 37.0 11.3 38.3 12.4 39.2 14.6 39.6 18.3 41.3 24.0 42.3 29.3 41.2 32.4 41.2 34.2 40.3 34.4 41.8 36.5 41.9 37.6 39.9 38.8 40.4 40.2 42.5 40.5 44.0 42.7 44.1 44.2 46.3 47.3 51.1 53.1 53.4 56.5 62.6 64.7"/><path d="M35.5 7.0 35.6 10.2 36.3 13.0 36.9 13.7 37.8 21.6 39.8 30.1 39.8 32.1 39.2 33.6 39.6 34.4 38.8 34.7 39.5 38.5 38.4 39.4 38.8 40.4 40.2 40.6 41.8 41.5 43.0 45.5 46.8 50.4 48.9 54.1 51.5 56.3 52.7 59.2 57.2 61.2 60.4 64.0"/></svg><svg class="c" style="--i:3" viewBox="0 0 86 72" preserveAspectRatio="xMidYMid meet" aria-hidden="true"><path d="M33.7 7.4 34.5 12.4 35.7 14.2 35.4 17.1 35.8 19.2 38.2 28.2 38.1 30.4 38.7 32.5 38.6 33.5 37.2 34.0 36.4 35.8 37.2 37.1 37.1 39.2 36.3 40.0 41.4 43.5 42.1 46.1 45.2 51.0 45.9 52.7 51.9 60.4 53.7 61.8 56.3 62.0 57.3 62.4 58.1 63.3"/><path d="M32.0 7.9 33.3 12.7 34.6 15.2 34.7 19.7 36.6 27.6 36.5 32.0 37.4 32.0 37.4 32.6 36.4 32.7 34.7 36.1 34.2 40.1 37.3 46.6 38.8 47.3 37.7 49.5 42.3 49.8 42.8 51.6 50.0 60.8"/><path d="M30.4 8.4 31.2 11.3 32.3 18.8 33.1 20.5 33.5 23.9 34.4 26.5 35.6 28.4 35.3 30.9 35.8 31.6 35.3 32.0 34.7 31.4 30.9 41.9 32.2 47.0 33.2 49.3 41.0 52.0 45.7 56.5 48.4 60.3"/><path d="M28.7 8.9 29.4 14.4 33.7 27.2 33.3 28.7 33.8 29.4 33.0 29.6 32.8 31.6 28.6 43.3 28.7 46.8 33.2 49.5 39.9 51.8 44.9 56.5 47.4 60.1"/><path d="M26.7 9.4 26.0 10.2 26.9 15.4 28.4 16.5 30.2 21.6 30.3 23.1 31.8 25.2 32.2 26.6 31.2 28.4 31.0 30.9 28.3 38.2 28.3 46.8 33.1 49.8 39.1 51.8 44.1 56.4 46.3 59.8"/><path d="M24.6 10.0 25.2 11.2 25.2 16.5 24.1 18.4 24.5 19.6 27.1 16.5 28.4 18.0 28.9 20.9 28.9 24.0 28.5 24.7 29.7 26.1 29.7 27.7 28.0 33.1 27.8 34.6 27.9 46.8 28.6 47.6 33.1 50.1 38.4 51.8 43.3 56.4 45.3 59.6"/></svg><svg class="c" style="--i:4" viewBox="0 0 86 72" preserveAspectRatio="xMidYMid meet" aria-hidden="true"><path d="M23.4 10.3 24.2 11.8 24.3 16.2 23.2 18.3 23.8 19.7 25.8 20.6 27.2 23.9 27.2 25.6 28.0 26.7 27.2 32.7 27.5 46.8 28.5 47.8 33.0 50.4 37.6 51.9 42.5 56.3 44.3 59.3"/><path d="M22.3 10.6 23.2 12.5 23.3 14.5 23.3 16.5 22.3 17.8 22.8 19.3 24.1 20.4 26.6 28.0 26.9 41.4 27.3 44.1 27.1 46.8 28.3 48.1 33.0 50.7 36.8 51.9 41.6 56.3 43.2 59.0"/><path d="M21.2 10.9 22.3 13.4 22.3 16.5 21.5 17.7 21.9 18.9 23.0 19.8 23.7 22.8 23.7 24.3 24.5 24.9 25.2 28.1 24.9 28.6 26.4 31.0 26.5 40.9 27.0 44.1 26.7 44.7 26.7 46.8 28.1 48.3 33.0 50.9 36.1 52.0 40.8 56.2 42.1 58.7"/><path d="M20.0 11.2 21.3 13.7 21.3 16.5 20.7 17.7 21.0 18.5 21.9 19.2 22.3 21.5 23.0 22.6 22.9 24.3 23.5 24.8 23.9 26.2 24.0 26.7 23.2 27.1 26.0 32.0 26.1 40.5 26.6 44.4 26.3 45.0 26.3 46.8 28.0 48.6 30.3 49.5 32.9 51.2 35.3 52.0 40.0 56.2 41.1 58.5"/><path d="M18.9 11.5 20.3 14.3 20.3 16.6 19.8 17.3 20.8 18.7 21.7 22.5 21.7 24.5 22.4 25.9 22.5 27.4 23.8 29.2 25.6 32.9 25.7 40.0 26.3 44.5 25.9 45.3 25.9 46.8 27.8 48.8 34.6 52.0 38.9 55.9 39.7 58.1"/><path d="M17.7 11.8 19.3 15.0 19.3 16.6 19.0 17.1 19.7 18.1 20.2 21.4 19.5 23.6 20.2 24.4 21.3 24.5 21.1 25.7 21.7 27.7 22.8 29.0 25.2 33.9 25.2 39.5 26.0 44.2 25.5 46.8 27.7 49.1 30.0 49.9 34.0 52.2 37.0 55.1 37.7 57.6"/></svg><svg class="c" style="--i:5" viewBox="0 0 86 72" preserveAspectRatio="xMidYMid meet" aria-hidden="true"><path d="M16.6 12.2 18.4 15.6 18.1 16.9 18.6 17.6 18.9 19.6 18.3 21.5 19.1 23.4 19.5 25.9 20.6 26.3 21.0 27.9 21.9 28.8 24.8 34.8 24.8 39.0 25.7 44.9 25.1 45.9 25.1 46.8 27.5 49.3 30.2 50.3 34.4 53.4 35.4 54.8 35.8 57.2"/><path d="M15.5 12.5 17.4 16.2 17.6 17.9 17.0 20.0 18.6 23.9 18.8 27.0 22.3 31.6 24.4 35.8 24.4 38.6 25.3 44.8 24.7 46.8 27.4 49.6 30.7 50.9 32.4 56.3"/><path d="M29.0 55.4 28.0 51.6 26.9 49.5 24.3 46.8 25.0 44.9 24.0 36.8 22.8 34.4 18.3 28.8 17.7 26.5 16.7 25.1 16.9 22.1 15.5 18.1 15.7 15.5 14.3 12.8"/><path d="M23.8 55.0 25.9 54.7 M26.3 54.8 25.7 50.4 23.9 46.8 24.7 45.8 24.7 45.1 23.5 37.8 17.4 29.5 17.0 27.0 13.9 22.1 15.0 19.6 14.9 18.4 12.8 13.2"/><path d="M17.7 54.8 19.0 54.4 23.4 50.9 23.2 46.5 24.2 46.0 22.3 40.4 20.0 35.2 16.7 29.9 16.3 27.5 12.4 21.6 12.8 19.9 13.9 17.4 12.2 13.3"/><path d="M17.8 53.2 21.8 50.4 19.7 49.2 18.1 52.0 17.8 53.2"/></svg><svg class="b" viewBox="0 0 86 72" preserveAspectRatio="xMidYMid meet" aria-hidden="true"><path d="M2.0 16.1 4.6 15.4 28.5 9.0 34.5 7.1 46.0 5.9 51.7 5.0 58.6 4.3 76.5 2.0 78.3 10.7 81.0 33.6 81.3 37.7 83.7 54.4 78.7 69.7 49.1 60.5 26.1 54.7 23.7 55.0 20.7 54.9 19.6 55.0 18.2 54.9 15.2 54.4 14.1 48.6 13.4 46.2 10.6 36.0 8.6 29.9 6.6 25.1 5.2 22.0 2.0 16.1Z"/></svg></div>
-    <div class="ld-cap" aria-hidden="true"><div class="ld-name"><span style="--i:0">N</span><span style="--i:1">y</span><span style="--i:2">a</span><span style="--i:3">n</span><span style="--i:4">y</span><span style="--i:5">i</span></div><div class="ld-coords">8°35′35″ S &nbsp;·&nbsp; 115°07′26″ E</div></div>
+    <div class="ld-cap" aria-hidden="true"><div class="ld-name"><span style="--i:0">N</span><span style="--i:1">y</span><span style="--i:2">a</span><span style="--i:3">n</span><span style="--i:4">y</span><span style="--i:5">i</span></div><div class="ld-coords"><span class="ll">8°35′35″ S &nbsp;·&nbsp; 115°07′26″ E</span><span class="pl">Kediri · Tabanan · Bali</span></div></div>
   </div>
   <div class="ld-foot" aria-hidden="true"><div class="ld-bar"><i id="ldBar"></i></div></div>
 </div>
@@ -560,16 +607,16 @@ html.ld-lock .hero .wrap>*{opacity:0;transform:translateY(26px)}
   <picture><source media="(max-aspect-ratio: 4/5)" srcset="media/poster-portrait.jpg"><img class="poster" src="media/poster.jpg" alt=""></picture>
   <video id="heroVideo" poster="media/poster.jpg" autoplay muted loop playsinline preload="auto" aria-hidden="true"></video>
   <div class="wrap">
-    <div class="coords">8°35′35″ S &nbsp;·&nbsp; 115°07′26″ E &nbsp;·&nbsp; Kediri, Tabanan, Bali</div>
+    <div class="coords"><span class="ll">8°35′35″ S &nbsp;·&nbsp; 115°07′26″ E &nbsp;·&nbsp; </span>Kediri, Tabanan, Bali</div>
     <h1>Nyanyi</h1>
-    <p class="sub">Jungle from the road down to the river, twelve minutes from Nyanyi Beach.</p>
+    <p class="sub">33 metres of jungle from the road down to the river, twelve minutes from Nyanyi Beach.</p>
     <div class="figs">
-      <div><b class="num">3,810 m²</b><span>Two plots: 18 and 15 are</span></div>
+      <div><b class="num">18 + 15 are</b><span>Two plots</span></div>
       <div class="gift"><b class="num">+ 2.5 are</b><span>Bonus land with each plot, free</span></div>
-      <div><b class="num">33 m</b><span>From the road down to the river</span></div>
       <div><b class="num">2055</b><span>Lease · extension guaranteed</span></div>
-      <div><b class="num">IDR 10–11 M</b><span>Per are, per year</span></div>
+      <div class="price"><b class="num">IDR 10–11 M</b><span>Per are, per year</span></div>
     </div>
+    <a class="hero-special" href="#contact" data-special>Ask for a special price if you buy both <i aria-hidden="true">→</i></a>
   </div>
 </header>
 
@@ -578,12 +625,12 @@ html.ld-lock .hero .wrap>*{opacity:0;transform:translateY(26px)}
   <div class="wrap">
     <div class="eyebrow">Why this land</div>
     <div class="facts">
-      <div><b>Down to the water</b><p>The land runs from the road to the edge of the riverbed: a wooded bank, lower terraces, and water over stone at the bottom.</p></div>
-      <div><b>Five are more</b><p>The survey measures 3,810 m². You pay for the 33 are on the title; the rest comes with the land.</p></div>
-      <div><b>One plot, or both</b><p>18 are and 15 are, each running from the road down to the river. Take one, or the whole valley.</p></div>
-      <div><b>Villa use confirmed</b><p>The regency’s 2024 zoning letter permits a villa: outright on the road side, with conditions on the river side.</p></div>
-      <div><b>Room to build</b><p>Up to 1,288 m² of footprint and 4,232 m² of floor space across the two plots.</p></div>
-      <div><b>Lease to 2055</b><p>An extension of up to 30 years is guaranteed, priced on the land alone, not on the house you build.</p></div>
+      <div><b>Down to the water</b><p>The land runs all the way to the riverbed. At the foot of your garden, water runs over stone.</p></div>
+      <div class="gift"><b>Five are, free</b><p>The survey measures 3,810 m². You pay for the 33 are on the title; about five more come with the land.</p></div>
+      <div><b>Above the canopy</b><p>The road runs 33 m above the riverbed. Build up for the view over the treetops, or down into their shade.</p></div>
+      <div><b>Villa use, confirmed</b><p>The regency’s 2024 zoning letter permits a villa: outright on the road side, with conditions on the river side.</p></div>
+      <div><b>Your house won’t raise the rent</b><p>The lease runs to 2055, and up to 30 more years are guaranteed, priced on the land alone. What you build is not counted.</p></div>
+      <div><b>Twelve minutes to the sea</b><p>Nyanyi Beach and Nuanu, with its international school, cafés and art, are a short drive away. You come home to the jungle.</p></div>
     </div>
 
     <div class="overview">
@@ -595,7 +642,7 @@ html.ld-lock .hero .wrap>*{opacity:0;transform:translateY(26px)}
       </div>
       <figure class="plan" style="margin:0">
         <svg id="planSvg" viewBox="0 0 100 100" role="img" aria-label="Survey plan: the land between the road and the river, divided into a north plot of 18 are and a south plot of 15 are, with 1 m contours and the surveyed trees"></svg>
-        <figcaption><span>Survey plan · Jun 2024 · contours 1 m</span><span>Division indicative · scale bar 10 m</span></figcaption>
+        <figcaption><span>Survey plan</span><span>Division indicative</span></figcaption>
       </figure>
     </div>
   </div>
@@ -612,7 +659,7 @@ html.ld-lock .hero .wrap>*{opacity:0;transform:translateY(26px)}
       <figure class="profile">
         <svg id="profileSvg" viewBox="0 0 1000 420" role="img" aria-label="Section from the road to the river: level ground at the road, a steep wooded bank, gentler terraces and the riverbed 33 m below"></svg>
         <div class="depth" aria-live="polite"><b id="depthVal" class="num">0 m</b><span id="depthNote">At the road</span></div>
-        <figcaption><span>Section · land survey · Jun 2024</span><span>Drag along the section</span></figcaption>
+        <figcaption><span>Section</span><span>Drag along the section</span></figcaption>
       </figure>
       <ol class="stops" id="stops">
           <li data-d="10"><span class="d"></span><div><b>The road shelf</b><p>Level ground where the gate opens and the light is widest.</p></div></li>
@@ -650,8 +697,8 @@ html.ld-lock .hero .wrap>*{opacity:0;transform:translateY(26px)}
         <div class="hint" id="hint">Drag to turn the model</div>
         <button type="button" class="grab" id="grabBtn" aria-pressed="false" aria-label="Take control of the 3D model"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 11V5.5a1.5 1.5 0 0 1 3 0V11"/><path d="M12 10V4.5a1.5 1.5 0 0 1 3 0V11"/><path d="M15 10.5V6.5a1.5 1.5 0 0 1 3 0v7.5a7 7 0 0 1-7 7h-.6a6 6 0 0 1-4.6-2.2l-3-3.7a1.6 1.6 0 0 1 2.4-2.1L9 15V11"/></svg><span id="grabTxt">Explore</span></button>
       </div>
-      <aside class="panel" aria-label="Model controls">
-        <div>
+      <aside class="panel" id="panel" aria-label="Model controls">
+        <div data-g="views" id="g-views">
           <h4>Views</h4>
           <div class="seg views" role="group" aria-label="Camera view">
             <button type="button" data-view="overview" aria-pressed="true">Overview</button>
@@ -660,26 +707,22 @@ html.ld-lock .hero .wrap>*{opacity:0;transform:translateY(26px)}
             <button type="button" data-view="plan" aria-pressed="false">Plan</button>
           </div>
         </div>
-        <div class="live-only" id="lyrBlock">
+        <div class="live-only" data-g="layers" id="lyrBlock">
           <h4>Layers</h4>
           <div class="toggles">
-            <label class="toggle"><input type="checkbox" id="lyr-plots" checked><span class="sw"></span>Plots · division indicative<i style="background:var(--brass-hi)"></i></label>
             <label class="toggle"><input type="checkbox" id="lyr-contours" checked><span class="sw"></span>Contours · 1 m<i style="background:#8b7a5a"></i></label>
             <label class="toggle"><input type="checkbox" id="lyr-trees" checked><span class="sw"></span>Trees · 13 surveyed<i style="background:#6f8a5e"></i></label>
-            <label class="toggle"><input type="checkbox" id="lyr-buildings"><span class="sw"></span>Existing buildings<i style="background:#aaa69b"></i></label>
           </div>
         </div>
-        <button type="button" class="more-btn live-only" id="moreBtn" aria-expanded="false" aria-controls="lyrBlock sunBlock">Layers &amp; sun</button>
-        <div>
+        <div data-g="terrain" id="g-terrain">
           <h4>Terrain</h4>
-          <div class="seg" role="group" aria-label="Terrain shading">
+          <div class="seg" role="group" aria-label="Terrain shading" style="grid-template-columns:repeat(2,1fr)">
             <button type="button" data-shade="clay" aria-pressed="true">Model</button>
             <button type="button" data-shade="slope" aria-pressed="false">Slope</button>
-            <button type="button" data-shade="elev" aria-pressed="false">Height</button>
           </div>
           <div class="legend" id="legend" hidden style="margin-top:14px"></div>
         </div>
-        <div class="sun live-only" id="sunBlock">
+        <div class="sun live-only" data-g="sun" id="sunBlock">
           <h4>Sun</h4>
           <label for="sunTime"><span>Local time</span><span id="sunLabel" class="num">15:30</span></label>
           <input type="range" id="sunTime" min="360" max="1110" step="5" value="930">
@@ -687,11 +730,12 @@ html.ld-lock .hero .wrap>*{opacity:0;transform:translateY(26px)}
           <input type="range" id="sunMonth" min="0" max="11" step="1" value="8">
           <div class="meta" id="sunMeta">—</div>
         </div>
-        <div class="panel-foot">
+        <div class="panel-foot" id="panelFoot">
           <a class="cta-link" href="#contact">See it in person · arrange a viewing →</a>
-          <p class="provenance">Source: topographic survey by PT Geotrah Pramana Sentosa, Jun 2024. The division between the plots is indicative. Trees and buildings are simplified.</p>
+          <p class="provenance">The division between the plots is indicative.</p>
         </div>
       </aside>
+      <div class="dock" id="dock" aria-label="Model controls"><button type="button" data-g="views" aria-expanded="false" aria-controls="g-views">View</button><button type="button" data-g="terrain" aria-expanded="false" aria-controls="g-terrain">Terrain</button><button type="button" class="live-only" data-g="layers" aria-expanded="false" aria-controls="lyrBlock">Layers</button><button type="button" class="live-only" data-g="sun" aria-expanded="false" aria-controls="sunBlock">Sun</button></div>
     </div>
   </div>
 </section>
@@ -771,7 +815,7 @@ html.ld-lock .hero .wrap>*{opacity:0;transform:translateY(26px)}
       <div><b class="num">1,288 m²</b><span>Build on up to 60% of the road side and 30% of the river side</span></div>
       <div><b class="num">4,232 m²</b><span>Floor space up to 2.4× the road side and 0.8× the river side</span></div>
     </div>
-    <p class="fine">Limits from the regency’s zoning letter (ITR 833.B/2024), applied to the 33 are on the title: about 995 m² on the road side, 2,305 m² on the river side.</p>
+    <p class="fine">Limits from the regency’s zoning letter, applied across the 33 are: about 995 m² on the road side, 2,305 m² on the river side.</p>
 
     <div class="route">
       <h3>From zoning to keys</h3>
@@ -1153,7 +1197,6 @@ stage.addEventListener('pointerup', endDrag); stage.addEventListener('pointercan
 const press = (sel, btn) => document.querySelectorAll(sel).forEach(x => x.setAttribute('aria-pressed', x === btn));
 const LEG = {
   slope: [['#aebf93', 'Under 15%, gentle'], ['#e2d29a', '15–30%, moderate'], ['#d39a63', '30–50%, steep'], ['#a4553f', 'Over 50%, very steep']].map(c => `<div><i style="background:${c[0]}"></i>${c[1]}</div>`).join(''),
-  elev: '<div><i style="background:linear-gradient(90deg,#4f7c78,#9fb59a,#e6dcb8,#c79c62);width:100%;height:8px"></i></div><div style="justify-content:space-between"><span>+70 m</span><span>+104 m</span></div>',
 };
 document.querySelectorAll('[data-view]').forEach(b => b.onclick = () => {
   if (live) return;
@@ -1272,8 +1315,10 @@ document.querySelectorAll('[data-shade]').forEach(b => b.onclick = () => {
   legend.hidden = shade === 'clay'; if (shade !== 'clay') legend.innerHTML = LEG[shade];
   paint();
 });
-const LAYERS = {plots:'lyr-plots', contours:'lyr-contours', trees:'lyr-trees', buildings:'lyr-buildings'};   // river and road are always on
-Object.entries(LAYERS).forEach(([k, id]) => { const el = document.getElementById(id); el.onchange = () => { if (W.groups[k]) W.groups[k].visible = el.checked; }; el.onchange(); });   // existing buildings start hidden
+const LAYERS = {contours:'lyr-contours', trees:'lyr-trees'};   // river, road and plots are always on; buildings never shown (user, 2026-09-29)
+Object.entries(LAYERS).forEach(([k, id]) => { const el = document.getElementById(id); el.onchange = () => { if (W.groups[k]) W.groups[k].visible = el.checked; }; el.onchange(); });
+if (W.groups.buildings) W.groups.buildings.visible = false;
+if (W.groups.plots) W.groups.plots.visible = true;
 
 /* hover shows the plot or the ground under the pointer; a click on a plot chooses it */
 const ray = new THREE.Raycaster(), mouse = new THREE.Vector2();
@@ -1326,7 +1371,7 @@ function frame(now){
   controls.update();
   renderer.render(scene, camera);
   const w = stage.clientWidth, h = stage.clientHeight;
-  tags.forEach(t => { const on = W.groups[t.layer] ? W.groups[t.layer].visible : true; v3.copy(t.p).project(camera); const vis = on && v3.z < 1 && Math.abs(v3.x) < 1.1 && Math.abs(v3.y) < 1.1; t.el.style.display = vis ? '' : 'none'; if (vis) t.el.style.transform = `translate(${(v3.x*.5+.5)*w}px, ${(-v3.y*.5+.5)*h}px) translate(-50%,-100%)`; });
+  tags.forEach(t => { const on = W.groups[t.layer] ? W.groups[t.layer].visible : true; v3.copy(t.p).project(camera); const vis = on && v3.z < 1 && Math.abs(v3.x) < 1.1 && Math.abs(v3.y) < 1.1; t.el.style.display = vis ? '' : 'none'; if (vis) { const hw = t.el.offsetWidth / 2 + 6, px = Math.min(Math.max((v3.x*.5+.5)*w, hw), w - hw); t.el.style.transform = `translate(${px}px, ${(-v3.y*.5+.5)*h}px) translate(-50%,-100%)`; } });   // kept inside the frame
   camera.getWorldDirection(dir);
   compassEl.style.transform = `rotate(${Math.atan2(dir.x, -dir.z) * -180/Math.PI}deg)`;
 }
@@ -1346,7 +1391,7 @@ const cCam = new THREE.PerspectiveCamera(32, 16/9, 4, 1000);
 const cCtl = new THREE.OrbitControls(cCam, cR.domElement);
 Object.assign(cCtl, {enableDamping:true, dampingFactor:.07, enableZoom:false, enablePan:false, maxPolarAngle:Math.PI*.46, minPolarAngle:Math.PI*.18});
 cCtl.autoRotate = !matchMedia('(prefers-reduced-motion: reduce)').matches; cCtl.autoRotateSpeed = .3;
-cCtl.target.set(-8, 15, 0); cCam.position.set(80, 56, 40); cCtl.update();
+cCtl.target.set(0, 12, 0); cCam.position.set(98, 64, 52); cCtl.update();   // pulled back so the river shows (2026-09-28)
 cCtl.addEventListener('start', () => { cCtl.autoRotate = false; });
 cR.domElement.style.touchAction = 'pan-y';
 const cGeo = new THREE.BufferGeometry();
@@ -1380,13 +1425,24 @@ let cVis = false; new IntersectionObserver(es => cVis = es[0].isIntersecting).ob
   const phone = matchMedia('(max-width: 760px)');
   document.querySelectorAll('.doc').forEach(d => d.addEventListener('click', () => { if (phone.matches) d.classList.toggle('open'); }));
   document.querySelectorAll('.qa').forEach(b => b.addEventListener('click', () => { if (!phone.matches) return; const a = b.closest('article'); a.classList.toggle('open'); b.setAttribute('aria-expanded', a.classList.contains('open')); }));
-  const more = document.getElementById('moreBtn');
-  more.addEventListener('click', () => { const p = more.closest('.panel'); p.classList.toggle('more'); more.setAttribute('aria-expanded', p.classList.contains('more')); });
+  // model controls on phones (2026-09-28, from Kaba-Kaba): a dock at the foot of the model opens one group at a time
+  // over the model; the viewing link and the source note move under the model
+  const viewerEl = document.querySelector('#model .viewer'), panelEl = document.getElementById('panel'), foot = document.getElementById('panelFoot');
+  const dockBtns = [...document.querySelectorAll('#dock button')];
+  const openGroup = g => {
+    dockBtns.forEach(b => b.setAttribute('aria-expanded', b.dataset.g === g));
+    panelEl.querySelectorAll(':scope > [data-g]').forEach(d => d.classList.toggle('open', d.dataset.g === g));
+    viewerEl.classList.toggle('dock-open', !!g);
+  };
+  dockBtns.forEach(b => b.addEventListener('click', () => openGroup(b.getAttribute('aria-expanded') === 'true' ? null : b.dataset.g)));
+  const placeFoot = () => { if (phone.matches) viewerEl.after(foot); else panelEl.appendChild(foot); };
+  placeFoot(); phone.addEventListener('change', placeFoot);
   const stick = document.getElementById('stick'), hero = document.querySelector('.hero'), contact = document.getElementById('contact');
-  let pastHero = false, atContact = false;
-  const upd = () => stick.classList.toggle('on', pastHero && !atContact);
-  new IntersectionObserver(es => { pastHero = !es[0].isIntersecting; upd(); }).observe(hero);
-  new IntersectionObserver(es => { atContact = es[0].isIntersecting; upd(); }).observe(contact);
+  let pastHero = false, atContact = false, atDock = false;
+  const upd = () => stick.classList.toggle('on', pastHero && !atContact && !atDock);   // never over the model's dock
+  new IntersectionObserver(es => { atDock = es[es.length - 1].isIntersecting; upd(); }).observe(document.getElementById('dock'));   // the newest entry wins: a fast scroll can queue several
+  new IntersectionObserver(es => { pastHero = !es[es.length - 1].isIntersecting; upd(); }).observe(hero);
+  new IntersectionObserver(es => { atContact = es[es.length - 1].isIntersecting; upd(); }).observe(contact);
 })();
 })();
 </script>
