@@ -407,7 +407,7 @@ footer p{max-width:80ch}
 .depth span{font:500 11px/1.4 var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
 .stops{list-style:none;margin:30px 0 0;padding:0;border-top:1px solid var(--text)}
 .stops li{display:grid;grid-template-columns:64px minmax(0,1fr);gap:14px;padding:18px 0;border-bottom:1px solid var(--line);cursor:pointer;transition:opacity .35s}
-.stops li:not(.on){opacity:.5}
+.stops li:not(.on){opacity:.72}
 .stops li .d{font:500 13px/1.7 var(--mono);color:var(--brass-deep);font-variant-numeric:tabular-nums}
 .stops li b{display:block;font:400 22px/1.2 var(--display)}
 .stops li p{font-size:15px;color:var(--muted);margin-top:6px;max-width:44ch}
@@ -614,7 +614,7 @@ html.ld-lock .hero .wrap>*{opacity:0;transform:translateY(26px)}
       <div><b class="num">18 + 15 are</b><span>Two plots</span></div>
       <div class="gift"><b class="num">+ 2.5 are</b><span>Bonus land with each plot, free</span></div>
       <div><b class="num">2055</b><span>Lease · extension guaranteed</span></div>
-      <div class="price"><b class="num">IDR 10–11 M</b><span>Per are, per year</span></div>
+      <div class="price"><b class="num">IDR 11 M</b><span>Per are, per year</span></div>
     </div>
     <a class="hero-special" href="#contact" data-special>Ask for a special price if you buy both <i aria-hidden="true">→</i></a>
   </div>
@@ -682,8 +682,8 @@ html.ld-lock .hero .wrap>*{opacity:0;transform:translateY(26px)}
     </div>
 
     <div class="plotpick" role="group" aria-label="Choose the land">
-      <button type="button" data-plot="both" aria-pressed="true"><span class="k">Both plots</span><b class="num">IDR 10.005 B</b><span>3,810 m² · ask for a special price</span></button>
-      <button type="button" data-plot="north" aria-pressed="false"><span class="k">North · 18 are</span><b class="num">IDR 5.22 B</b><span>≈ 2,060 m² with bonus</span></button>
+      <button type="button" data-plot="both" aria-pressed="true"><span class="k">Both plots</span><b class="num">IDR 10.527 B</b><span>3,810 m² · ask for a special price</span></button>
+      <button type="button" data-plot="north" aria-pressed="false"><span class="k">North · 18 are</span><b class="num">IDR 5.742 B</b><span>≈ 2,060 m² with bonus</span></button>
       <button type="button" data-plot="south" aria-pressed="false"><span class="k">South · 15 are</span><b class="num">IDR 4.785 B</b><span>≈ 1,760 m² with bonus</span></button>
     </div>
     <a class="special" href="#contact" id="specialModel" data-special><span>Taking both plots?</span><b>Ask for our special price <i aria-hidden="true">→</i></b></a>
@@ -744,7 +744,7 @@ html.ld-lock .hero .wrap>*{opacity:0;transform:translateY(26px)}
   <div class="wrap">
     <div class="gal-head">
       <div>
-        <h2>Down <em>to the water.</em></h2>
+        <h2>See it <em>from above.</em></h2>
       </div>
     </div>
     <div class="film-frame">
@@ -872,11 +872,11 @@ html.ld-lock .hero .wrap>*{opacity:0;transform:translateY(26px)}
     <div class="contact">
       <div>
         <div class="eyebrow">Private viewing</div>
-        <h2 style="margin:14px 0 22px">Walk it down <em>to the water.</em></h2>
+        <h2 style="margin:14px 0 22px">Come and <em>stand on it.</em></h2>
         <p class="lede">We walk the land with you from the road to the river, survey in hand. If you are abroad, we can do a live video walk of the site.</p>
         <div class="figs" style="margin-top:44px;grid-template-columns:1fr 1fr">
-          <div><b class="num" id="priceIdr">IDR 10.005 B</b><span id="priceNote">Both plots · the two prices together</span></div>
-          <div><b class="num" id="priceUsd">≈ USD 566k</b><span>At 17,688 IDR / USD</span></div>
+          <div><b class="num" id="priceIdr">IDR 10.527 B</b><span id="priceNote">Both plots · IDR 11 M per are, per year</span></div>
+          <div><b class="num" id="priceUsd">≈ USD 595k</b><span>At 17,688 IDR / USD</span></div>
         </div>
         <a class="special" href="#contact" id="askSpecial" data-special><span>Taking both plots?</span><b>Ask for our special price <i aria-hidden="true">→</i></b></a>
       </div>
@@ -901,7 +901,7 @@ html.ld-lock .hero .wrap>*{opacity:0;transform:translateY(26px)}
 <a class="stick" id="stick" href="#contact" data-special-none>Arrange a viewing</a>
 <footer class="dark">
   <div class="wrap">
-    <p>Figures come from ITR 833.B (30 Aug 2024), the topographic survey of June 2024 and the lease terms. The division between the plots is indicative. Everything here is indicative and should be verified before any transaction. USD at 17,688 IDR.</p>
+    <p>Figures are indicative and should be verified before any transaction. The division between the plots is indicative. USD at 17,688 IDR.</p>
     <p>Nyanyi · Tabanan · Bali</p>
   </div>
 </footer>
@@ -919,8 +919,8 @@ const LAT = -8.593048, LON = 115.123789;
 const fmt = n => n.toLocaleString('en-US');
 const PLOT = Object.fromEntries(S.plots.map(p => [p.id, p]));
 const PRICE = {
-  both:  {idr: 'IDR 10.005 B', usd: '≈ USD 566k', note: 'Both plots · the two prices together'},
-  north: {idr: 'IDR 5.22 B',   usd: '≈ USD 295k', note: 'North plot · IDR 10 M per are, per year'},
+  both:  {idr: 'IDR 10.527 B', usd: '≈ USD 595k', note: 'Both plots · IDR 11 M per are, per year'},   // 11 M for both plots (user, 2026-09-30)
+  north: {idr: 'IDR 5.742 B',  usd: '≈ USD 325k', note: 'North plot · IDR 11 M per are, per year'},
   south: {idr: 'IDR 4.785 B',  usd: '≈ USD 271k', note: 'South plot · IDR 11 M per are, per year'},
 };
 const DROP = Math.round(S.stats.land_zmax - S.stats.land_zmin);
@@ -1130,7 +1130,7 @@ cStage.addEventListener('pointermove', e => { if (cDx === null) return; const d 
 ['pointerup', 'pointercancel', 'pointerleave'].forEach(t => cStage.addEventListener(t, () => { cDx = null; }));
 
 /* ---------- drive times, as listed ---------- */
-const TIMES = [['OMNI gym',10],['Nyanyi Beach',12],['Nuanu City',12]];
+const TIMES = [['Nyanyi Beach',12],['Nuanu City',12]];
 document.getElementById('times').innerHTML = TIMES.map(t => `<div class="time"><strong>${t[0]}</strong><div class="track"><i style="width:${t[1]/15*100}%"></i></div><span class="num">${t[1]} min</span></div>`).join('');
 
 /* ---------- enquiry ---------- */
@@ -1438,9 +1438,11 @@ let cVis = false; new IntersectionObserver(es => cVis = es[0].isIntersecting).ob
   const placeFoot = () => { if (phone.matches) viewerEl.after(foot); else panelEl.appendChild(foot); };
   placeFoot(); phone.addEventListener('change', placeFoot);
   const stick = document.getElementById('stick'), hero = document.querySelector('.hero'), contact = document.getElementById('contact');
-  let pastHero = false, atContact = false, atDock = false;
-  const upd = () => stick.classList.toggle('on', pastHero && !atContact && !atDock);   // never over the model's dock
-  new IntersectionObserver(es => { atDock = es[es.length - 1].isIntersecting; upd(); }).observe(document.getElementById('dock'));   // the newest entry wins: a fast scroll can queue several
+  let pastHero = false, atContact = false; const under = new Set();
+  const upd = () => stick.classList.toggle('on', pastHero && !atContact && !under.size);
+  // never over a control or a list in the bottom band of the screen where the pill floats (user, 2026-09-30)
+  const band = new IntersectionObserver(es => { es.forEach(e => e.isIntersecting ? under.add(e.target) : under.delete(e.target)); upd(); }, {rootMargin: '-86% 0px 0px 0px'});
+  document.querySelectorAll('#dock, .plotpick, .stops, .pot .scen, #times, .envelope, .route ol').forEach(el => band.observe(el));
   new IntersectionObserver(es => { pastHero = !es[es.length - 1].isIntersecting; upd(); }).observe(hero);
   new IntersectionObserver(es => { atContact = es[es.length - 1].isIntersecting; upd(); }).observe(contact);
 })();
