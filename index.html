@@ -614,7 +614,7 @@ html.ld-lock .hero .wrap>*{opacity:0;transform:translateY(26px)}
       <div><b class="num">18 + 15 are</b><span>Two plots</span></div>
       <div class="gift"><b class="num">+ 2.5 are</b><span>Bonus land with each plot, free</span></div>
       <div><b class="num">2055</b><span>Lease · extension guaranteed</span></div>
-      <div class="price"><b class="num">IDR 11 M</b><span>Per are, per year</span></div>
+      <div class="price"><b class="num">IDR 10–11 M</b><span>Per are, per year</span></div>
     </div>
     <a class="hero-special" href="#contact" data-special>Ask for a special price if you buy both <i aria-hidden="true">→</i></a>
   </div>
@@ -682,8 +682,8 @@ html.ld-lock .hero .wrap>*{opacity:0;transform:translateY(26px)}
     </div>
 
     <div class="plotpick" role="group" aria-label="Choose the land">
-      <button type="button" data-plot="both" aria-pressed="true"><span class="k">Both plots</span><b class="num">IDR 10.527 B</b><span>3,810 m² · ask for a special price</span></button>
-      <button type="button" data-plot="north" aria-pressed="false"><span class="k">North · 18 are</span><b class="num">IDR 5.742 B</b><span>≈ 2,060 m² with bonus</span></button>
+      <button type="button" data-plot="both" aria-pressed="true"><span class="k">Both plots</span><b class="num">IDR 10.005 B</b><span>3,810 m² · ask for a special price</span></button>
+      <button type="button" data-plot="north" aria-pressed="false"><span class="k">North · 18 are</span><b class="num">IDR 5.22 B</b><span>≈ 2,060 m² with bonus</span></button>
       <button type="button" data-plot="south" aria-pressed="false"><span class="k">South · 15 are</span><b class="num">IDR 4.785 B</b><span>≈ 1,760 m² with bonus</span></button>
     </div>
     <a class="special" href="#contact" id="specialModel" data-special><span>Taking both plots?</span><b>Ask for our special price <i aria-hidden="true">→</i></b></a>
@@ -875,8 +875,8 @@ html.ld-lock .hero .wrap>*{opacity:0;transform:translateY(26px)}
         <h2 style="margin:14px 0 22px">Come and <em>stand on it.</em></h2>
         <p class="lede">We walk the land with you from the road to the river, survey in hand. If you are abroad, we can do a live video walk of the site.</p>
         <div class="figs" style="margin-top:44px;grid-template-columns:1fr 1fr">
-          <div><b class="num" id="priceIdr">IDR 10.527 B</b><span id="priceNote">Both plots · IDR 11 M per are, per year</span></div>
-          <div><b class="num" id="priceUsd">≈ USD 595k</b><span>Approximate, in US dollars</span></div>
+          <div><b class="num" id="priceIdr">IDR 10.005 B</b><span id="priceNote">Both plots · IDR 10–11 M per are, per year</span></div>
+          <div><b class="num" id="priceUsd">≈ USD 566k</b><span>Approximate, in US dollars</span></div>
         </div>
         <a class="special" href="#contact" id="askSpecial" data-special><span>Taking both plots?</span><b>Ask for our special price <i aria-hidden="true">→</i></b></a>
       </div>
@@ -919,8 +919,8 @@ const LAT = -8.593048, LON = 115.123789;
 const fmt = n => n.toLocaleString('en-US');
 const PLOT = Object.fromEntries(S.plots.map(p => [p.id, p]));
 const PRICE = {
-  both:  {idr: 'IDR 10.527 B', usd: '≈ USD 595k', note: 'Both plots · IDR 11 M per are, per year'},   // 11 M for both plots (user, 2026-09-30)
-  north: {idr: 'IDR 5.742 B',  usd: '≈ USD 325k', note: 'North plot · IDR 11 M per are, per year'},
+  both:  {idr: 'IDR 10.005 B', usd: '≈ USD 566k', note: 'Both plots · IDR 10–11 M per are, per year'},   // 11 M for both plots (user, 2026-09-30)
+  north: {idr: 'IDR 5.22 B',  usd: '≈ USD 295k', note: 'North plot · IDR 10 M per are, per year'},
   south: {idr: 'IDR 4.785 B',  usd: '≈ USD 271k', note: 'South plot · IDR 11 M per are, per year'},
 };
 const DROP = Math.round(S.stats.land_zmax - S.stats.land_zmin);
