@@ -766,7 +766,7 @@ html.ld-lock .hero .wrap>*{opacity:0;transform:translateY(26px)}
       </div>
       <div>
         <div class="times" id="times"></div>
-        <div class="scale"><span></span><div><span>0</span><span>5 min</span><span>10 min</span><span>15</span></div><span></span></div>
+        <div class="scale"><span></span><div><span>0</span><span>10 min</span><span>20 min</span><span>30</span><span>40</span></div><span></span></div>
         <div class="loc-note">
           <span>Approximate drive times.</span>
           <a href="https://maps.app.goo.gl/2BBWExkjBwr961V87" target="_blank" rel="noopener">Open in Google Maps ↗</a>
@@ -1130,8 +1130,9 @@ cStage.addEventListener('pointermove', e => { if (cDx === null) return; const d 
 ['pointerup', 'pointercancel', 'pointerleave'].forEach(t => cStage.addEventListener(t, () => { cDx = null; }));
 
 /* ---------- drive times, as listed ---------- */
-const TIMES = [['Nyanyi Beach',12],['Nuanu City',12]];
-document.getElementById('times').innerHTML = TIMES.map(t => `<div class="time"><strong>${t[0]}</strong><div class="track"><i style="width:${t[1]/15*100}%"></i></div><span class="num">${t[1]} min</span></div>`).join('');
+// Nyanyi Beach / Nuanu: listing; Pererenan and the airport: OSRM from the plot, no traffic, rounded up (2026-10-01)
+const TIMES = [['Nyanyi Beach',12],['Nuanu City · international school',12],['Canggu · Pererenan Beach',15],['Airport',35]];
+document.getElementById('times').innerHTML = TIMES.map(t => `<div class="time"><strong>${t[0]}</strong><div class="track"><i style="width:${t[1]/40*100}%"></i></div><span class="num">${t[1]} min</span></div>`).join('');
 
 /* ---------- enquiry ---------- */
 document.getElementById('enquiry').addEventListener('submit', e => {
